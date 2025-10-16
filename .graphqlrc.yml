@@ -1,0 +1,5 @@
+schema: './backend/src/_generate/schema.gql'
+extensions:
+  languageService:
+    cacheSchemaFileForLookup: true
+documents: '**/*.ts'

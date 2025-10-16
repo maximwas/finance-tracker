@@ -1,0 +1,65 @@
+// schema.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id             String           @id @default(cuid())
+  email          String           @unique
+  password       String
+  firstName      String
+  lastName       String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  refreshTokens  RefreshToken[]
+  categories     Category[]
+  transactions   Transaction[]
+}
+
+model RefreshToken {
+  id             String           @id @default(cuid())
+  token          String           @unique
+  expiresAt      DateTime
+  createdAt      DateTime         @default(now())
+
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id             String           @id @default(cuid())
+  name           String
+  type           CategoryType  
+  color          String       
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  transactions   Transaction[]
+}
+
+model Transaction {
+  id             String           @id @default(cuid())
+  amount         Decimal          @db.Decimal(10, 1)
+  description    String?
+  date           DateTime         @default(now())
+
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  categoryId     String
+  category       Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
+}
