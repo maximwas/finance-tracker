@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
+import { User } from '@prisma/client';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-
+import { ConfigService } from 'src/modules/config/config.service';
 import { UserService } from 'src/modules/user/user.service';
+
 import { JWTPayload } from '../types/jwt-payload';
 
 @Injectable()
@@ -14,17 +15,17 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: configService.getOrThrow<string>('JWT_SECRET_KEY'),
+      secretOrKey: configService.getJWTSecret(),
     });
   }
 
-  async validate(payload: JWTPayload): Promise<JWTPayload> {
+  async validate(payload: JWTPayload): Promise<User> {
     const user = await this.userService.findById(payload.id);
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    return payload;
+    return user;
   }
 }

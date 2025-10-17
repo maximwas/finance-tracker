@@ -1,19 +1,25 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
   Req,
   Res,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { UserInputDto } from '../user/dto/user.input';
-import { AuthService } from './auth.service';
-import { User } from '@prisma/client';
+import type { User } from '@prisma/client';
 import type { Request, Response } from 'express';
-import { AuthPayload, AuthPayloadProp } from './types/token.type';
-import { ConfigService } from '@nestjs/config';
-import ms from 'ms';
+
+import { AuthService } from './auth.service';
+import { SignupDto } from './dto/signup.dto';
+import { LocalAuthGuard } from './guard/local-auth.guard';
+import { TokenInterceptor } from './interceptors/token.interceptor';
+import { AuthPayload } from './types/token.type';
+import { ConfigService } from '../config/config.service';
+import { CurrentUser } from '../user/decorator/user.decorator';
 
 @Controller({
   version: '1',
@@ -21,38 +27,47 @@ import ms from 'ms';
 })
 export class AuthController {
   constructor(
-    private configService: ConfigService,
     private authService: AuthService,
+    private configService: ConfigService,
   ) {}
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @Post('signup')
-  signup(@Body() signupDto: UserInputDto): Promise<User> {
+  @UseInterceptors(TokenInterceptor)
+  signup(@Body() signupDto: SignupDto): Promise<AuthPayload> {
     return this.authService.signup(signupDto);
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('refresh')
-  async refresh(
-    @Req() req: Request,
-    @Res() res: Response,
-  ): Promise<Pick<AuthPayload, AuthPayloadProp.AccessToken>> {
-    const refreshToken = req.cookies?.Refresh as string | null;
-    const authPayload = await this.authService.refreshToken(refreshToken);
+  @Get('refresh')
+  @UseInterceptors(TokenInterceptor)
+  refresh(@Req() req: Request): Promise<AuthPayload> {
+    const refreshToken = req.cookies[
+      this.configService.getRefreshTokenKey()
+    ] as string | null;
 
-    res.cookie(
-      this.configService.getOrThrow('REFRESH_TOKEN_KEY'),
-      refreshToken,
-      {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: this.configService.getOrThrow('NODE_ENV') !== 'develop',
-        maxAge: ms('7d'),
-      },
-    );
+    return this.authService.refreshToken(refreshToken);
+  }
 
-    return {
-      [AuthPayloadProp.AccessToken]: authPayload[AuthPayloadProp.AccessToken],
-    };
+  @HttpCode(HttpStatus.OK)
+  @Post('login')
+  @UseGuards(LocalAuthGuard)
+  @UseInterceptors(TokenInterceptor)
+  login(@CurrentUser() user: User): Promise<AuthPayload> {
+    return this.authService.login(user);
+  }
+
+  @Get('logout')
+  async logout(@Req() req: Request, @Res() res: Response): Promise<void> {
+    const refreshToken = req.cookies[
+      this.configService.getRefreshTokenKey()
+    ] as string | null;
+
+    if (refreshToken) {
+      await this.authService.logout(refreshToken);
+    }
+
+    res.clearCookie(this.configService.getRefreshTokenKey());
+    res.status(HttpStatus.NO_CONTENT).send();
   }
 }

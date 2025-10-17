@@ -9,12 +9,24 @@ export class ConfigService extends ConfigServiceNest {
 
   public isDev(): boolean {
     return (
-      this.getOrThrow('NODE_ENV') === 'develop' ||
-      this.getOrThrow('NODE_ENV') === 'local'
+      this.getOrThrow<string>('NODE_ENV') === 'develop' ||
+      this.getOrThrow<string>('NODE_ENV') === 'local'
     );
   }
 
+  public isStage(): boolean {
+    return this.getOrThrow<string>('NODE_ENV') === 'stage';
+  }
+
   public isProduction(): boolean {
-    return this.getOrThrow('NODE_ENV') === 'prod';
+    return this.getOrThrow<string>('NODE_ENV') === 'prod';
+  }
+
+  public getJWTSecret(): string {
+    return this.getOrThrow<string>('JWT_SECRET');
+  }
+
+  public getRefreshTokenKey(): string {
+    return this.getOrThrow<string>('REFRESH_TOKEN_KEY');
   }
 }

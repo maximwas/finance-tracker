@@ -1,14 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { JWTPayload } from './types/jwt-payload';
+import { RefreshToken } from '@prisma/client';
 import dayjs from 'dayjs';
-import ms from 'ms';
+
+import { JWTPayload } from './types/jwt-payload';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class RefreshTokenService {
   constructor(private prisma: PrismaService) {}
 
-  public async validateRefreshToken(
+  public async create(
+    data: Pick<RefreshToken, 'token' | 'expiresAt' | 'userId'>,
+  ): Promise<void> {
+    await this.prisma.refreshToken.create({
+      data,
+    });
+  }
+
+  public async validate(
     token: string,
     jwtPayload: JWTPayload,
   ): Promise<string | null> {
@@ -37,19 +46,7 @@ export class RefreshTokenService {
     return token;
   }
 
-  public async updateToken(oldToken: string, newToken: string): Promise<void> {
-    await this.prisma.refreshToken.update({
-      where: {
-        token: oldToken,
-      },
-      data: {
-        token: newToken,
-        expiresAt: dayjs(ms('7d')).toString(),
-      },
-    });
-  }
-
-  public async revokeToken(token: string): Promise<void> {
+  public async revoke(token: string): Promise<void> {
     await this.prisma.refreshToken.update({
       where: {
         token,
@@ -58,5 +55,46 @@ export class RefreshTokenService {
         revoked: true,
       },
     });
+  }
+
+  public async deleteByToken(token: string): Promise<void> {
+    await this.prisma.refreshToken.delete({
+      where: { token },
+    });
+  }
+
+  public async deleteExpiredTokens(take: number = 100): Promise<void> {
+    const expiredTokens = await this.prisma.refreshToken.findMany({
+      where: {
+        OR: [
+          {
+            revoked: true,
+          },
+          {
+            expiresAt: {
+              lt: dayjs().toDate(),
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+      },
+      take,
+    });
+
+    if (expiredTokens.length === 0) return;
+
+    const ids = expiredTokens.map((token) => token.id);
+
+    await this.prisma.refreshToken.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    console.log(`Deleted ${ids.length} expired tokens`);
   }
 }
