@@ -13,11 +13,11 @@ import { AuthModule } from './modules/auth/auth.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/_generate/schema.gql'),
-      installSubscriptionHandlers: true,
-    }),
+    // GraphQLModule.forRoot<ApolloDriverConfig>({
+    //   driver: ApolloDriver,
+    //   autoSchemaFile: join(process.cwd(), 'src/_generate/schema.gql'),
+    //   installSubscriptionHandlers: true,
+    // }),
     PrismaModule,
     UserModule,
     AuthModule,
