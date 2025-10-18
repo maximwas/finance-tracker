@@ -22,7 +22,7 @@ import { getCookie } from 'src/shared/utils/get-cookie';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LocalAuthGuard } from './guard/local-auth.guard';
-import { TokenInterceptor } from './interceptors/token.interceptor';
+import { TokenInterceptor } from './interceptor/token.interceptor';
 import { AuthPayload } from './types/token.type';
 import { ConfigService } from '../config/config.service';
 import { CurrentUser } from '../user/decorator/user.decorator';
