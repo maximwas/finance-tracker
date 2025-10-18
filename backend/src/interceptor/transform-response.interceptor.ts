@@ -14,9 +14,8 @@ type UnifiedResponse<T = unknown> =
   | { data: T; extensions: ApiResponse<T> };
 
 @Injectable()
-export class TransformResponseInterceptor<
-  T = unknown,
-> implements NestInterceptor<T>
+export class TransformResponseInterceptor<T = unknown>
+  implements NestInterceptor<T>
 {
   intercept(
     context: ExecutionContext,
