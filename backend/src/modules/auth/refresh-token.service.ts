@@ -20,7 +20,7 @@ export class RefreshTokenService {
   public async validate(
     token: string,
     jwtPayload: JWTPayload,
-  ): Promise<string | null> {
+  ): Promise<RefreshToken | null> {
     const storedToken = await this.prisma.refreshToken.findUnique({
       where: {
         token,
@@ -35,15 +35,11 @@ export class RefreshTokenService {
       return null;
     }
 
-    if (storedToken.revoked) {
-      return null;
-    }
-
     if (dayjs(storedToken.expiresAt).isBefore(dayjs())) {
       return null;
     }
 
-    return token;
+    return storedToken;
   }
 
   public async revoke(token: string): Promise<void> {

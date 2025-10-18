@@ -7,3 +7,9 @@ export interface AuthPayload {
   [AuthPayloadProp.RefreshToken]: string;
   [AuthPayloadProp.AccessToken]: string;
 }
+
+export interface IRefreshTokenOptions {
+  isSSR: boolean;
+  times: string | undefined;
+  signature: string | undefined;
+}
