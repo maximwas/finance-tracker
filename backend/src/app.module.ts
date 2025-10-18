@@ -16,7 +16,6 @@ import { UserModule } from './modules/user/user.module';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/_generate/schema.gql'),
       installSubscriptionHandlers: true,
-      context: ({ req, res }) => ({ req, res }),
     }),
     PrismaModule,
     UserModule,

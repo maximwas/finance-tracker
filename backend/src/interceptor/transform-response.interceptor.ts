@@ -7,7 +7,7 @@ import {
 import { GqlContextType } from '@nestjs/graphql';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiResponse } from 'src/dto/api-response.dto';
+import { ApiResponse } from 'src/dto/api-response-dto';
 
 type UnifiedResponse<T = unknown> =
   | ApiResponse<T>

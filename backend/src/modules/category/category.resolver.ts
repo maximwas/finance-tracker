@@ -7,7 +7,7 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { GqlAuthGuard } from '../auth/guard/gql-auth.guard';
-import { CurrentUser } from '../user/decorator/user.decorator';
+import { GqlCurrentUser } from '../user/decorator/user.decorator';
 
 @Resolver()
 export class CategoryResolver {
@@ -23,7 +23,7 @@ export class CategoryResolver {
   @Query(() => [CategoryModel])
   getCategoriesByName(
     @Args('name') name: string,
-    @CurrentUser() user: User,
+    @GqlCurrentUser() user: User,
   ): Promise<CategoryModel[]> {
     return this.categoryService.findManyByNameAndUserId(name, user.id);
   }
@@ -32,7 +32,7 @@ export class CategoryResolver {
   @Mutation(() => CategoryModel)
   createCategory(
     @Args('createCategoryDto') createCategoryDto: CreateCategoryDto,
-    @CurrentUser() user: User,
+    @GqlCurrentUser() user: User,
   ): Promise<CategoryModel> {
     return this.categoryService.create(createCategoryDto, user);
   }

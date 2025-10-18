@@ -1,18 +1,17 @@
 import {
   ArgumentsHost,
   Catch,
-  ContextType,
   ExceptionFilter,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
-import { GqlContextType } from '@nestjs/graphql';
 import { Response } from 'express';
-import { ApiResponse } from 'src/dto/api-response.dto';
+import { ApiResponse } from 'src/dto/api-response-dto';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost): void {
+  catch(exception: unknown, host: ArgumentsHost): ApiResponse | undefined {
     const ctx = host.switchToHttp();
 
     const status =
@@ -25,23 +24,24 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getResponse()
         : 'Internal server error';
 
+    const message =
+      typeof response === 'string'
+        ? response
+        : Array.isArray(response['message'])
+          ? response['message'].join(', ')
+          : (response['message'] as string) || 'Internal server error';
+
+    Logger.error(exception);
+
     const errorResponse = new ApiResponse({
       data: null,
       success: false,
-      message:
-        typeof response === 'string'
-          ? response
-          : (response['message'] as string),
+      message,
     });
 
-    if (host.getType<ContextType>() === 'http') {
+    if (host.getType() === 'http') {
       ctx.getResponse<Response>().status(status).json(errorResponse);
-
       return;
-    }
-
-    if (host.getType<GqlContextType>() === 'graphql') {
-      throw new Error(JSON.stringify(errorResponse));
     }
   }
 }
