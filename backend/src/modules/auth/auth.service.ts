@@ -9,11 +9,21 @@ import * as bcrypt from 'bcrypt';
 import dayjs from 'dayjs';
 import ms from 'ms';
 import { pick } from 'radash';
+import {
+  EXPIRES_AT_ACCESS_TOKEN,
+  EXPIRES_AT_REFRESH_TOKEN,
+} from 'src/constants';
+import { hash } from 'src/shared/utils/hash';
 
 import { SignupDto } from './dto/signup.dto';
 import { RefreshTokenService } from './refresh-token.service';
 import { JWTPayload } from './types/jwt-payload';
-import { AuthPayload, AuthPayloadProp } from './types/token.type';
+import {
+  AuthPayload,
+  AuthPayloadProp,
+  IRefreshTokenOptions,
+} from './types/token.type';
+import { ConfigService } from '../config/config.service';
 import { UserService } from '../user/user.service';
 
 @Injectable()
@@ -22,6 +32,7 @@ export class AuthService {
     private jwtService: JwtService,
     private refreshTokenService: RefreshTokenService,
     private userService: UserService,
+    private configService: ConfigService,
   ) {}
 
   public async verifyUser(
@@ -30,7 +41,7 @@ export class AuthService {
   ): Promise<User | null> {
     const user = await this.userService.findByEmail(email);
 
-    if (user && (await this.compare(password, user.password))) {
+    if (user && (await bcrypt.compare(password, user.password))) {
       return user;
     }
 
@@ -44,9 +55,10 @@ export class AuthService {
       throw new ConflictException('User with this email already exists');
     }
 
+    const hashed = await bcrypt.hash(signupDto.password, 10);
     const user = await this.userService.create({
       ...signupDto,
-      password: await this.hash(signupDto.password),
+      password: hashed,
     });
 
     const tokens = await this.generateTokens(pick(user, ['id', 'email']));
@@ -54,35 +66,65 @@ export class AuthService {
     return tokens;
   }
 
-  public async refreshToken(token: string | null): Promise<AuthPayload> {
-    try {
-      if (!token) {
-        throw new UnauthorizedException('Token empty');
-      }
+  public async refreshToken(
+    token: string | null,
+    { isSSR, times, signature }: IRefreshTokenOptions,
+  ): Promise<AuthPayload> {
+    if (!token) {
+      throw new UnauthorizedException('Token empty');
+    }
 
-      const jwtPayload = await this.jwtService.verifyAsync<JWTPayload>(token);
-      const storedToken = await this.refreshTokenService.validate(
-        token,
-        jwtPayload,
-      );
+    if (isSSR) {
+      this.validateSSRSignature(token, times, signature);
+    }
 
-      if (!storedToken) {
-        throw new UnauthorizedException('Invalid or expired refresh token');
-      }
+    const jwtPayload = await this.jwtService.verifyAsync<JWTPayload>(token);
+    const hashed = hash(token, this.configService.getRefreshTokenSecret());
+    const storedToken = await this.refreshTokenService.validate(
+      hashed,
+      jwtPayload,
+    );
 
-      const accessToken = await this.jwtService.signAsync<JWTPayload>(
-        pick(jwtPayload, ['id', 'email']),
-        {
-          expiresIn: ms('30m'),
-        },
-      );
+    if (!storedToken) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
 
+    if (isSSR) {
       return {
-        [AuthPayloadProp.AccessToken]: accessToken,
+        [AuthPayloadProp.AccessToken]: await this.generateAccessToken(
+          pick(jwtPayload, ['id', 'email']),
+        ),
         [AuthPayloadProp.RefreshToken]: token,
       };
-    } catch {
-      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    if (storedToken.revoked) {
+      throw new UnauthorizedException(
+        'Refresh token has already been used or revoked',
+      );
+    }
+
+    await this.refreshTokenService.revoke(hashed);
+
+    return this.generateTokens(pick(jwtPayload, ['id', 'email']));
+  }
+
+  private validateSSRSignature(
+    token: string,
+    times: IRefreshTokenOptions['times'],
+    signature: IRefreshTokenOptions['signature'],
+  ): void {
+    if (!times || !signature) {
+      throw new UnauthorizedException('Invalid SSR refresh');
+    }
+
+    const expected = hash(
+      `${token}.${times}`,
+      this.configService.getSSRSecret(),
+    );
+
+    if (expected !== signature) {
+      throw new UnauthorizedException('Invalid SSR signature');
     }
   }
 
@@ -96,25 +138,20 @@ export class AuthService {
     await this.refreshTokenService.revoke(token);
   }
 
-  public async generateTokens(jwtPayload: JWTPayload): Promise<AuthPayload> {
-    const accessToken = await this.jwtService.signAsync<JWTPayload>(
-      jwtPayload,
-      {
-        expiresIn: ms('30m'),
-      },
-    );
-
-    const refreshToken = await this.jwtService.signAsync<JWTPayload>(
-      jwtPayload,
-      {
-        expiresIn: ms('7d'),
-      },
+  private async generateTokens(jwtPayload: JWTPayload): Promise<AuthPayload> {
+    const accessToken = await this.generateAccessToken(jwtPayload);
+    const refreshToken = await this.generateRefreshToken(jwtPayload);
+    const hashed = hash(
+      refreshToken,
+      this.configService.getRefreshTokenSecret(),
     );
 
     await this.refreshTokenService.create({
       userId: jwtPayload.id,
-      token: refreshToken,
-      expiresAt: dayjs().add(7, 'day').toDate(),
+      token: hashed,
+      expiresAt: dayjs()
+        .add(Number(EXPIRES_AT_REFRESH_TOKEN[0]), 'day')
+        .toDate(),
     });
 
     return {
@@ -123,11 +160,25 @@ export class AuthService {
     };
   }
 
-  public async hash(password: string): Promise<string> {
-    return bcrypt.hash(password, 10);
+  private async generateAccessToken(jwtPayload: JWTPayload): Promise<string> {
+    const accessToken = await this.jwtService.signAsync<JWTPayload>(
+      jwtPayload,
+      {
+        expiresIn: ms(EXPIRES_AT_ACCESS_TOKEN),
+      },
+    );
+
+    return accessToken;
   }
 
-  public async compare(password: string, hash: string): Promise<boolean> {
-    return bcrypt.compare(password, hash);
+  private async generateRefreshToken(jwtPayload: JWTPayload): Promise<string> {
+    const refreshToken = await this.jwtService.signAsync<JWTPayload>(
+      jwtPayload,
+      {
+        expiresIn: ms(EXPIRES_AT_REFRESH_TOKEN),
+      },
+    );
+
+    return refreshToken;
   }
 }

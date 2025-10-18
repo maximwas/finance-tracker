@@ -29,4 +29,12 @@ export class ConfigService extends ConfigServiceNest {
   public getRefreshTokenKey(): string {
     return this.getOrThrow<string>('REFRESH_TOKEN_KEY');
   }
+
+  public getSSRSecret(): string {
+    return this.getOrThrow<string>('SSR_SECRET');
+  }
+
+  public getRefreshTokenSecret(): string {
+    return this.getOrThrow<string>('REFRESH_TOKEN_SECRET');
+  }
 }

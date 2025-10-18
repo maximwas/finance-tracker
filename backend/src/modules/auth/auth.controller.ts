@@ -12,6 +12,12 @@ import {
 } from '@nestjs/common';
 import type { User } from '@prisma/client';
 import type { Request, Response } from 'express';
+import {
+  HEADER_REQUEST_SSR,
+  HEADER_SIGNATURE_SSR,
+  HEADER_TIMES_SSR,
+} from 'src/constants';
+import { getCookie } from 'src/shared/utils/get-cookie';
 
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
@@ -42,11 +48,20 @@ export class AuthController {
   @Get('refresh')
   @UseInterceptors(TokenInterceptor)
   refresh(@Req() req: Request): Promise<AuthPayload> {
-    const refreshToken = req.cookies[
-      this.configService.getRefreshTokenKey()
-    ] as string | null;
+    const isSSR = req.headers[HEADER_REQUEST_SSR] === 'true';
+    const times = req.headers[HEADER_TIMES_SSR] as string | undefined;
+    const signature = req.headers[HEADER_SIGNATURE_SSR] as string | undefined;
 
-    return this.authService.refreshToken(refreshToken);
+    const refreshToken = getCookie(
+      req.cookies,
+      this.configService.getRefreshTokenKey(),
+    );
+
+    return this.authService.refreshToken(refreshToken, {
+      isSSR,
+      times,
+      signature,
+    });
   }
 
   @HttpCode(HttpStatus.OK)
@@ -59,9 +74,10 @@ export class AuthController {
 
   @Get('logout')
   async logout(@Req() req: Request, @Res() res: Response): Promise<void> {
-    const refreshToken = req.cookies[
-      this.configService.getRefreshTokenKey()
-    ] as string | null;
+    const refreshToken = getCookie(
+      req.cookies,
+      this.configService.getRefreshTokenKey(),
+    );
 
     if (refreshToken) {
       await this.authService.logout(refreshToken);
