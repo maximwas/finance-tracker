@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Category, User } from '@prisma/client';
+import { Category } from '@prisma/client';
 
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -13,10 +13,13 @@ import { PrismaService } from '../prisma/prisma.service';
 export class CategoryService {
   constructor(private prisma: PrismaService) {}
 
-  public async create(data: CreateCategoryDto, user: User): Promise<Category> {
+  public async create(
+    data: CreateCategoryDto,
+    userId: string,
+  ): Promise<Category> {
     const currentCategory = await this.findFirstByNameAndUserId(
       data.name,
-      user.id,
+      userId,
     );
 
     if (currentCategory) {
@@ -28,7 +31,7 @@ export class CategoryService {
     const category = this.prisma.category.create({
       data: {
         ...data,
-        userId: user.id,
+        userId,
       },
     });
 

@@ -34,7 +34,7 @@ export class CategoryResolver {
     @Args('createCategoryDto') createCategoryDto: CreateCategoryDto,
     @GqlCurrentUser() user: User,
   ): Promise<CategoryModel> {
-    return this.categoryService.create(createCategoryDto, user);
+    return this.categoryService.create(createCategoryDto, user.id);
   }
 
   @UseGuards(GqlAuthGuard)
