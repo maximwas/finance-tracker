@@ -7,7 +7,6 @@ import { ConfigService } from './config.service';
 @Module({
   imports: [
     ConfigModuleNest.forRoot({
-      isGlobal: true,
       envFilePath: '.env',
     }),
   ],
