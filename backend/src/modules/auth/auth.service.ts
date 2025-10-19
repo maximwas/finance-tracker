@@ -7,7 +7,6 @@ import { JwtService } from '@nestjs/jwt';
 import type { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import dayjs from 'dayjs';
-import ms from 'ms';
 import { pick } from 'radash';
 import {
   EXPIRES_AT_ACCESS_TOKEN,
@@ -128,14 +127,21 @@ export class AuthService {
     }
   }
 
-  public async login(user: User): Promise<AuthPayload> {
+  public async login(user: User, token: string | null): Promise<AuthPayload> {
     const tokens = await this.generateTokens(pick(user, ['id', 'email']));
+    if (token) {
+      const hashed = hash(token, this.configService.getRefreshTokenSecret());
+
+      await this.refreshTokenService.revoke(hashed);
+    }
 
     return tokens;
   }
 
   public async logout(token: string): Promise<void> {
-    await this.refreshTokenService.revoke(token);
+    const hashed = hash(token, this.configService.getRefreshTokenSecret());
+
+    await this.refreshTokenService.revoke(hashed);
   }
 
   private async generateTokens(jwtPayload: JWTPayload): Promise<AuthPayload> {
@@ -164,7 +170,7 @@ export class AuthService {
     const accessToken = await this.jwtService.signAsync<JWTPayload>(
       jwtPayload,
       {
-        expiresIn: ms(EXPIRES_AT_ACCESS_TOKEN),
+        expiresIn: EXPIRES_AT_ACCESS_TOKEN,
       },
     );
 
@@ -175,7 +181,7 @@ export class AuthService {
     const refreshToken = await this.jwtService.signAsync<JWTPayload>(
       jwtPayload,
       {
-        expiresIn: ms(EXPIRES_AT_REFRESH_TOKEN),
+        expiresIn: EXPIRES_AT_REFRESH_TOKEN,
       },
     );
 

@@ -10,6 +10,6 @@ export interface AuthPayload {
 
 export interface IRefreshTokenOptions {
   isSSR: boolean;
-  times: string | undefined;
-  signature: string | undefined;
+  times: string | null;
+  signature: string | null;
 }

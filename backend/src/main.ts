@@ -15,8 +15,8 @@ async function bootstrap(): Promise<void> {
   });
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
-  app.useGlobalInterceptors(new TransformResponseInterceptor());
-  app.useGlobalFilters(new AllExceptionsFilter());
+  // app.useGlobalInterceptors(new TransformResponseInterceptor());
+  // app.useGlobalFilters(new AllExceptionsFilter());
 
   await app.listen(process.env.PORT ?? 3000);
 

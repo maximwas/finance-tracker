@@ -18,6 +18,7 @@ import {
   HEADER_TIMES_SSR,
 } from 'src/constants';
 import { getCookie } from 'src/shared/utils/get-cookie';
+import { getHeader } from 'src/shared/utils/get-header';
 
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
@@ -48,9 +49,9 @@ export class AuthController {
   @Get('refresh')
   @UseInterceptors(TokenInterceptor)
   refresh(@Req() req: Request): Promise<AuthPayload> {
-    const isSSR = req.headers[HEADER_REQUEST_SSR] === 'true';
-    const times = req.headers[HEADER_TIMES_SSR] as string | undefined;
-    const signature = req.headers[HEADER_SIGNATURE_SSR] as string | undefined;
+    const isSSR = getHeader<string>(req.headers, HEADER_REQUEST_SSR) === 'true';
+    const times = getHeader<string>(req.headers, HEADER_TIMES_SSR);
+    const signature = getHeader<string>(req.headers, HEADER_SIGNATURE_SSR);
 
     const refreshToken = getCookie(
       req.cookies,
@@ -68,8 +69,13 @@ export class AuthController {
   @Post('login')
   @UseGuards(LocalAuthGuard)
   @UseInterceptors(TokenInterceptor)
-  login(@CurrentUser() user: User): Promise<AuthPayload> {
-    return this.authService.login(user);
+  login(@Req() req: Request, @CurrentUser() user: User): Promise<AuthPayload> {
+    const refreshToken = getCookie(
+      req.cookies,
+      this.configService.getRefreshTokenKey(),
+    );
+
+    return this.authService.login(user, refreshToken);
   }
 
   @Get('logout')
