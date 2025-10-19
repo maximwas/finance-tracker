@@ -84,6 +84,18 @@ export class CategoryService {
     return categories;
   }
 
+  public async getAll(
+    userId: string,
+  ): Promise<Category[]> {
+    const categories = await this.prisma.category.findMany({
+      where: {
+        userId,
+      },
+    });
+
+    return categories;
+  }
+
   public async updateById(
     id: string,
     data: UpdateCategoryDto,

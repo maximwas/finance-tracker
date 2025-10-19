@@ -29,6 +29,14 @@ export class CategoryResolver {
   }
 
   @UseGuards(GqlAuthGuard)
+  @Query(() => [CategoryModel])
+  getAllCategories(
+    @GqlCurrentUser() user: User,
+  ): Promise<CategoryModel[]> {
+    return this.categoryService.getAll(user.id);
+  }
+
+  @UseGuards(GqlAuthGuard)
   @Mutation(() => CategoryModel)
   createCategory(
     @Args('createCategoryDto') createCategoryDto: CreateCategoryDto,
