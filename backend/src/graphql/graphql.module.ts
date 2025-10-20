@@ -6,7 +6,6 @@ import { AuthModule } from 'src/api/modules/auth/auth.module';
 
 import { CategoryModule } from './modules/category/category.module';
 import { UserModule } from './modules/user/user.module';
-
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -15,8 +14,8 @@ import { UserModule } from './modules/user/user.module';
       installSubscriptionHandlers: true,
     }),
     AuthModule,
-    CategoryModule,
     UserModule,
+    CategoryModule,
   ],
   exports: [UserModule, CategoryModule],
 })
