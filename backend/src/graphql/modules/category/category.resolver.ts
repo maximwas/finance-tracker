@@ -37,21 +37,21 @@ export class CategoryResolver {
   @UseGuards(GqlAuthGuard)
   @Mutation(() => CategoryModel)
   createCategory(
-    @Args('createCategoryDto') createCategoryDto: CreateCategoryDto,
+    @Args('data') data: CreateCategoryDto,
     @GqlCurrentUser() user: User,
   ): Promise<CategoryModel> {
-    return this.categoryService.create(createCategoryDto, user.id);
+    return this.categoryService.create(data, user.id);
   }
 
   @UseGuards(GqlAuthGuard)
   @Mutation(() => CategoryModel)
-  deleteById(@Args('id') id: string): Promise<CategoryModel> {
+  deleteCategoryById(@Args('id') id: string): Promise<CategoryModel> {
     return this.categoryService.deleteById(id);
   }
 
   @UseGuards(GqlAuthGuard)
   @Mutation(() => CategoryModel)
-  updateById(
+  updateCategoryById(
     @Args('id') id: string,
     @Args('data') data: UpdateCategoryDto,
   ): Promise<CategoryModel> {

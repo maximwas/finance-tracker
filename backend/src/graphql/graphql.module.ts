@@ -5,8 +5,8 @@ import { join } from 'path';
 import { AuthModule } from 'src/api/modules/auth/auth.module';
 
 import { CategoryModule } from './modules/category/category.module';
-import { UserModule } from './modules/user/user.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
+import { UserModule } from './modules/user/user.module';
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({

@@ -7,9 +7,10 @@ import { printSchema } from 'graphql';
 import { mkdirSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 
-import { CategoryResolver } from '../src/modules/category/category.resolver' 
+import { CategoryResolver } from '../src/graphql/modules/category/category.resolver';
+import { TransactionResolver } from '../src/graphql/modules/transaction/transaction.resolver';
 
-const resolvers = [CategoryResolver];
+const resolvers = [CategoryResolver, TransactionResolver];
 
 async function generateSchema() {
   const app = await NestFactory.create(GraphQLSchemaBuilderModule);
