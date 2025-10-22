@@ -43,10 +43,10 @@ export class TransactionResolver {
   )
   @Mutation(() => TransactionPayload)
   createTransaction(
-    @Args('input') input: CreateTransactionDto,
+    @Args('data') data: CreateTransactionDto,
     @GqlCurrentUser() user: User,
   ): Promise<Transaction> {
-    return this.transactionService.create(input, user.id);
+    return this.transactionService.create(data, user.id);
   }
 
   @UseGuards(GqlAuthGuard)
