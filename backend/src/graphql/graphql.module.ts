@@ -5,6 +5,7 @@ import { join } from 'path';
 import { AuthModule } from 'src/api/modules/auth/auth.module';
 
 import { CategoryModule } from './modules/category/category.module';
+import { TransactionModule } from './modules/transaction/transaction.module';
 import { UserModule } from './modules/user/user.module';
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UserModule } from './modules/user/user.module';
     AuthModule,
     UserModule,
     CategoryModule,
+    TransactionModule,
   ],
   exports: [UserModule, CategoryModule],
 })
