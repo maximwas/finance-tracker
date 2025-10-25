@@ -1,9 +1,9 @@
-import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
+import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client';
 import fetch from 'cross-fetch';
 
 let apolloClient: ApolloClient;
 
-function createApolloClient() {
+function createApolloClient(): ApolloClient {
   const httpLink = new HttpLink({
     uri: 'http://localhost:3003/graphql',
     fetch,
@@ -16,7 +16,7 @@ function createApolloClient() {
   });
 }
 
-export function initializeApollo() {
+export function initializeApollo(): ApolloClient {
   const _apolloClient = apolloClient ?? createApolloClient();
 
   if (typeof window === 'undefined') return _apolloClient;

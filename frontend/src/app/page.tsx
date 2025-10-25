@@ -1,20 +1,5 @@
-import { initializeApollo } from "@/lib/apolloClient";
-import { GET_COUNT } from "@/graphql/queries/clicker";
-import ClientClicker from "@/components/ClientClicker";
-import { GetCountQuery } from "@/_generate/graphql";
+import { type JSX } from 'react';
 
-export default async function HomePage() {
-  const client = initializeApollo();
-
-  const { data } = await client.query<GetCountQuery>({
-    query: GET_COUNT,
-    fetchPolicy: "no-cache",
-  });
-
-  return (
-    <div>
-      <p>Count: {data?.getCount.count}</p>
-      <ClientClicker />
-    </div>
-  );
+export default async function HomePage(): Promise<JSX.Element> {
+  return <div></div>;
 }
