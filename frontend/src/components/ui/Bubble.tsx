@@ -1,7 +1,7 @@
 import { type JSX } from 'react';
 
+import { cn } from '@/lib/utils';
 import { type DefaultUIProps } from '@/types/defaultProps';
-import { cn } from '@/utils/cn';
 
 export interface IBubbleProps extends DefaultUIProps {
   animationDelay?: number;

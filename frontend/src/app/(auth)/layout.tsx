@@ -1,6 +1,6 @@
 import { type JSX } from 'react';
 
-import { Bubble } from '@/components/ui/Bubble';
+import { Bubble } from '@/components/ui/bubble';
 
 export interface IAuthLayout {
   children: React.ReactNode;

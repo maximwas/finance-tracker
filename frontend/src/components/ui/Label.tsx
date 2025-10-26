@@ -1,19 +1,22 @@
-import { type JSX, type ReactNode } from 'react';
+import * as LabelPrimitive from '@radix-ui/react-label';
+import * as React from 'react';
 
-import { type DefaultUIProps } from '@/types/defaultProps';
-import { cn } from '@/utils/cn';
+import { cn } from '@/lib/utils';
 
-export interface ILabelProps extends DefaultUIProps {
-  from: string;
-  children: ReactNode;
-}
-
-export function Label({ from, className, children }: ILabelProps): JSX.Element {
+function Label({
+  className,
+  ...props
+}: React.ComponentProps<typeof LabelPrimitive.Root>): React.JSX.Element {
   return (
-    <>
-      <label form={from} className={cn('', className)} data-slot="label">
-        {children}
-      </label>
-    </>
+    <LabelPrimitive.Root
+      data-slot="label"
+      className={cn(
+        'flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50',
+        className,
+      )}
+      {...props}
+    />
   );
 }
+
+export { Label };
