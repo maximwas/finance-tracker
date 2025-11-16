@@ -4,7 +4,7 @@ import '../styles/globals.css';
 
 import { type JSX } from 'react';
 
-import { ApolloWrapper } from '@/components/apollo/ApolloWrapper';
+import { ApolloWrapper } from '@/components/apollo/apolloWrapper';
 import { Theme, ThemeProvider } from '@/contexts/ThemeContext';
 
 export interface IRootLayout {
@@ -16,7 +16,8 @@ export default function RootLayout({ children }: IRootLayout): JSX.Element {
     <html lang="en">
       <body cz-shortcut-listen="true">
         <ThemeProvider defaultTheme={Theme.Light}>
-          <ApolloWrapper>{children}</ApolloWrapper>
+          {/* <ApolloWrapper>{children}</ApolloWrapper> */}
+          {children}
         </ThemeProvider>
       </body>
     </html>

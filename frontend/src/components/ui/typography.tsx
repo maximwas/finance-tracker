@@ -6,4 +6,8 @@ function TypographyP({ children, className }: React.ComponentProps<'p'>): React.
   return <p className={cn(className)}>{children}</p>;
 }
 
-export { TypographyP };
+function TypographyH4({ children, className }: React.ComponentProps<'h4'>): React.JSX.Element {
+  return <h4 className={cn(className)}>{children}</h4>;
+}
+
+export { TypographyH4, TypographyP };

@@ -1,5 +1,13 @@
-import { type JSX } from 'react';
+import * as React from 'react';
 
-export default async function Register(): Promise<JSX.Element> {
-  return <div id="register">Register</div>;
+import { WrapperAuth } from '@/components/auth/wrapperAuth';
+
+import { RegisterForm } from './RegisterForm';
+
+export default function Register(): React.JSX.Element {
+  return (
+    <WrapperAuth title="Create your financial profile">
+      <RegisterForm></RegisterForm>
+    </WrapperAuth>
+  );
 }
