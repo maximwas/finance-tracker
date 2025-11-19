@@ -3,7 +3,7 @@
 import { Sparkles } from 'lucide-react';
 import type * as React from 'react';
 
-import { Logo } from '../logo/Logo';
+import { Logo } from '../logo/logo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 
 export interface IWrapperAuthProps {
