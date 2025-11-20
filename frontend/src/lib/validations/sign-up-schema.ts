@@ -1,13 +1,9 @@
 import * as Yup from 'yup';
 
 export const signUpSchema = Yup.object().shape({
-  firstName: Yup.string()
-    .required('First name is required')
-    .max(128, 'First name must be at least 128 characters long'),
-
-  lastName: Yup.string()
-    .required('Last name is required')
-    .max(128, 'Last name must be at least 128 characters long'),
+  name: Yup.string()
+    .required('Name is required')
+    .max(128, 'Name must be at least 128 characters long'),
 
   email: Yup.string().required('Email is required').email('Email must be an email'),
 

@@ -3,6 +3,7 @@ import { ErrorMessage, useFormikContext } from 'formik';
 import { AlertCircle } from 'lucide-react';
 import * as React from 'react';
 
+import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { TypographyP } from '../ui/typography';
 
@@ -16,6 +17,7 @@ export interface ISelectFieldProps extends React.ComponentProps<typeof SelectPri
   placeholder?: string;
   className?: string;
   name: string;
+  label: string;
 }
 
 function SelectField<T extends Record<string, string>>({
@@ -23,12 +25,15 @@ function SelectField<T extends Record<string, string>>({
   className,
   placeholder,
   name,
+  label,
   ...props
 }: ISelectFieldProps): React.JSX.Element {
   const { setFieldValue, values } = useFormikContext<T>();
 
   return (
     <>
+      <Label htmlFor={name}>{label}</Label>
+
       <Select
         name={name}
         value={values[name]}

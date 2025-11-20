@@ -17,7 +17,7 @@ export interface FormFieldProps {
   type: string;
   placeholder: string;
   value?: string;
-  as?: React.ElementType;
+  as?: string;
   className?: string;
 }
 
@@ -28,12 +28,13 @@ function FormField({
   className,
   type,
   placeholder,
+  as = 'input',
 }: FormFieldProps): React.JSX.Element {
   return (
     <div className={cn('space-y-2', className)}>
       <Label htmlFor={name}>{label}</Label>
 
-      <Input id={id} name={name} type={type} placeholder={placeholder} />
+      <Input as={as} id={id} name={name} type={type} placeholder={placeholder} />
 
       <ErrorMessage
         name={name}

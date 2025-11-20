@@ -12,7 +12,7 @@ export function SingInForm(): React.JSX.Element {
     <AuthForm<SingInFormValues>
       submitText="Sign in"
       redirectText="Don't have an account?"
-      redirectLink="/register"
+      redirectLink="/sing-up"
       redirectLabel="Sign Up"
       initialValues={{
         email: '',
