@@ -54,17 +54,6 @@ const eslintConfig = [
       ],
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
-      'import/order': [
-        'error',
-        {
-          groups: [
-            ['builtin', 'external'],
-            ['internal'],
-            ['parent', 'sibling', 'index'],
-          ],
-          'newlines-between': 'always',
-        },
-      ],
       '@typescript-eslint/explicit-function-return-type': [
         'error',
         {
