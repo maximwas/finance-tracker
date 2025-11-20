@@ -2,12 +2,12 @@ import * as React from 'react';
 
 import { WrapperAuth } from '@/components/auth/wrapperAuth';
 
-import { RegisterForm } from './RegisterForm';
+import { SignUpForm } from './SignUpForm';
 
 export default function Register(): React.JSX.Element {
   return (
     <WrapperAuth title="Create your financial profile">
-      <RegisterForm></RegisterForm>
+      <SignUpForm></SignUpForm>
     </WrapperAuth>
   );
 }

@@ -3,13 +3,13 @@ import { useCallback } from 'react';
 
 import { FormField } from '@/components/form/formField';
 import { AuthForm } from '@/components/forms/authForm';
-import { type LoginFormValues, loginSchema } from '@/lib/validations/login-schema';
+import { type SingInFormValues, singInSchema } from '@/lib/validations/sing-in-schema';
 
-export function LoginForm(): React.JSX.Element {
+export function SingInForm(): React.JSX.Element {
   const onSubmit = useCallback(() => {}, []);
 
   return (
-    <AuthForm<LoginFormValues>
+    <AuthForm<SingInFormValues>
       submitText="Sign in"
       redirectText="Don't have an account?"
       redirectLink="/register"
@@ -18,7 +18,7 @@ export function LoginForm(): React.JSX.Element {
         email: '',
         password: '',
       }}
-      validationSchema={loginSchema}
+      validationSchema={singInSchema}
       onSubmit={onSubmit}
     >
       <div className="space-y-2">

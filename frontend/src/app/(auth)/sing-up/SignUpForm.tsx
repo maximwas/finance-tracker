@@ -5,13 +5,13 @@ import { useCallback } from 'react';
 import { FormField } from '@/components/form/formField';
 import { SelectField } from '@/components/form/selectField';
 import { AuthForm } from '@/components/forms/authForm';
-import { type RegisterFormValues, registerSchema } from '@/lib/validations/register-schema';
+import { type SignUpFormValues, signUpSchema } from '@/lib/validations/sign-up-schema';
 
-export function RegisterForm(): React.JSX.Element {
+export function SignUpForm(): React.JSX.Element {
   const onSubmit = useCallback(() => {}, []);
 
   return (
-    <AuthForm<RegisterFormValues>
+    <AuthForm<SignUpFormValues>
       submitText="Sing up"
       redirectText="Already have an account?"
       redirectLink="/login"
@@ -19,14 +19,24 @@ export function RegisterForm(): React.JSX.Element {
       initialValues={{
         email: '',
         password: '',
-        name: '',
+        firstName: '',
+        lastName: '',
         currency: '',
       }}
-      validationSchema={registerSchema}
+      validationSchema={signUpSchema}
       onSubmit={onSubmit}
     >
       <div className="space-y-2">
-        <FormField label="Name" id="name" name="name" type="name" placeholder="John Doe" />
+        <FormField
+          label="First name"
+          id="firstName"
+          name="firstName"
+          type="text"
+          placeholder="John"
+        />
+      </div>
+      <div className="space-y-2">
+        <FormField label="Last name" id="lastName" name="lastName" type="text" placeholder="Doe" />
       </div>
       <div className="space-y-2">
         <FormField
