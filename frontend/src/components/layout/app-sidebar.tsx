@@ -1,10 +1,10 @@
 'use client';
 
-import { Dialog, DialogContent, DialogTrigger } from '@radix-ui/react-dialog';
 import { BarChart3, LayoutDashboard, LogOut, Receipt, Settings, Sparkles, Tag } from 'lucide-react';
+import { motion } from 'motion/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import * as React from 'react';
+import { type JSX, useLayoutEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -71,21 +71,57 @@ const SIDEBAR_MENU: ISidebarMenu[] = [
   },
 ];
 
-export function AppSidebar(): React.JSX.Element {
+export function AppSidebar(): JSX.Element {
+  const firstRender = useRef(true);
+  const buttonsRef = useRef<HTMLButtonElement[]>([]);
+  const menuRef = useRef<HTMLUListElement>(null);
+
+  const [indicator, setIndicator] = useState({ y: 0, height: 0 });
+  const [background, setBackground] = useState<string>('');
+
   const pathname = usePathname();
 
-  const isActive = (url: string): boolean => {
-    return url === pathname;
+  const isActive = (url: string): boolean => url === pathname;
+
+  const setButtons = (element: HTMLButtonElement | null, index: number): void => {
+    if (element) {
+      buttonsRef.current[index] = element;
+    }
   };
+
+  const moveTo = (index: number): void => {
+    const btn = buttonsRef.current[index];
+    const menu = menuRef.current;
+
+    if (!btn || !menu) return;
+
+    const btnRect = btn.getBoundingClientRect();
+    const menuRect = menu.getBoundingClientRect();
+
+    setIndicator({
+      y: btnRect.top - menuRect.top,
+      height: btnRect.height,
+    });
+
+    setBackground(SIDEBAR_MENU[index].gradient);
+
+    // ❗ Обов’язково: після першого позиціонування виключаємо "перший рендер"
+    firstRender.current = false;
+  };
+
+  // ❗ Важливо — useLayoutEffect, щоб indicator став одразу, без затримки
+  useLayoutEffect(() => {
+    const activeIndex = SIDEBAR_MENU.findIndex((item) => item.url === pathname);
+    if (activeIndex !== -1) moveTo(activeIndex);
+  }, [pathname]);
 
   return (
     <Sidebar>
       <SidebarHeader className="flex-row gap-2 p-4">
-        <Logo width={25} height={25}></Logo>
+        <Logo width={25} height={25} />
         <div className="flex flex-col justify-center gap-1">
           <TypographyH5 className="text-base bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent flex gap-2 items-center">
-            FinTracker
-            <Sparkles className="w-5 h-5 text-purple-500" />
+            FinTracker <Sparkles className="w-5 h-5 text-purple-500" />
           </TypographyH5>
           <TypographyP className="text-xs text-muted-foreground">Smart Finance</TypographyP>
         </div>
@@ -95,16 +131,13 @@ export function AppSidebar(): React.JSX.Element {
 
       <SidebarContent>
         <SidebarGroup className="p-4">
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-linear-to-br from-background/50 to-muted/50 hover:from-accent/50 hover:to-accent transition-all duration-300 border border-border/50">
-            <div className="relative">
-              <div className="absolute inset-0 bg-linear-to-br from-blue-500 to-purple-500 rounded-full blur-md opacity-50"></div>
-              <Avatar className="h-12 w-12 border-2 border-white/50 dark:border-gray-700/50 relative">
-                <AvatarImage src="" alt="IП" />
-                <AvatarFallback className="bg-linear-to-br from-blue-500 to-purple-500 text-white">
-                  IП
-                </AvatarFallback>
-              </Avatar>
-            </div>
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-linear-to-br from-background/50 to-muted/50 border border-border/50">
+            <Avatar className="h-12 w-12 border-2 border-white/50 dark:border-gray-700/50">
+              <AvatarImage src="" alt="IП" />
+              <AvatarFallback className="bg-linear-to-br from-blue-500 to-purple-500 text-white">
+                IП
+              </AvatarFallback>
+            </Avatar>
             <div className="flex-1 min-w-0">
               <p className="text-sm truncate text-foreground">Іван Петренко</p>
             </div>
@@ -115,18 +148,33 @@ export function AppSidebar(): React.JSX.Element {
 
         <SidebarGroup className="p-4">
           <SidebarGroupContent>
-            <SidebarMenu className="gap-5">
-              {SIDEBAR_MENU.map((item) => (
+            <SidebarMenu ref={menuRef} className="relative gap-5">
+              {/* Анімований indicator */}
+              <motion.div
+                className={cn(
+                  'absolute w-full rounded-xl shadow-lg shadow-primary/25 bg-linear-to-r',
+                  background,
+                )}
+                animate={indicator}
+                transition={
+                  firstRender.current
+                    ? { duration: 0 } // ⛔ без анімації на старті
+                    : {
+                        type: 'spring',
+                        stiffness: 260,
+                        damping: 28,
+                      }
+                }
+              />
+
+              {SIDEBAR_MENU.map((item, index) => (
                 <SidebarMenuItem key={item.id}>
-                  {isActive(item.url) ? (
-                    <div
-                      className={cn(
-                        'absolute inset-0 bg-linear-to-r from-pink-500 to-rose-500 opacity-100 rounded-xl',
-                        item.gradient,
-                      )}
-                    ></div>
-                  ) : null}
-                  <SidebarMenuButton variant={isActive(item.url) ? 'active' : 'default'} asChild>
+                  <SidebarMenuButton
+                    ref={(el) => setButtons(el, index)}
+                    variant={isActive(item.url) ? 'active' : 'default'}
+                    onClick={() => moveTo(index)}
+                    asChild
+                  >
                     <Link href={item.url}>
                       <item.icon />
                       <span>{item.label}</span>
@@ -142,18 +190,13 @@ export function AppSidebar(): React.JSX.Element {
       <SidebarSeparator />
 
       <SidebarFooter className="p-4">
-        <Dialog>
-          <DialogTrigger>
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-3 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20 group"
-            >
-              <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-300" />
-              <span>Logout</span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]"></DialogContent>
-        </Dialog>
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-3 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20 group"
+        >
+          <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-300" />
+          <span>Logout</span>
+        </Button>
       </SidebarFooter>
     </Sidebar>
   );

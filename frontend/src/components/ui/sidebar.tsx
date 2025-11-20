@@ -451,7 +451,7 @@ const sidebarMenuButtonVariants = cva(
     variants: {
       variant: {
         default: 'text-black',
-        active: 'text-white shadow-lg shadow-primary/25',
+        active: 'text-white',
       },
       size: {
         default: '',
