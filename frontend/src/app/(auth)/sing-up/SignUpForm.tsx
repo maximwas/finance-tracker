@@ -2,9 +2,9 @@
 
 import { useCallback } from 'react';
 
-import { FormField } from '@/components/form/formField';
-import { SelectField } from '@/components/form/selectField';
-import { AuthForm } from '@/components/forms/authForm';
+import { FormField } from '@/components/form/form-field';
+import { SelectField } from '@/components/form/select-field';
+import { AuthForm } from '@/components/layout/auth-form';
 import { getFirstNameAndLastName } from '@/lib/utils';
 import { type SignUpFormValues, signUpSchema } from '@/lib/validations/sign-up-schema';
 

@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { WrapperAuth } from '@/components/auth/wrapperAuth';
+import { WrapperAuth } from '@/components/layout/wrapper-auth';
 
 import { SignUpForm } from './SignUpForm';
 

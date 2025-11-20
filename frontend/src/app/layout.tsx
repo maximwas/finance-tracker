@@ -4,7 +4,7 @@ import '../styles/globals.css';
 
 import { type JSX } from 'react';
 
-import { ApolloWrapper } from '@/components/apollo/apolloWrapper';
+import { ApolloWrapper } from '@/components/apollo/apollo-wrapper';
 import { Theme, ThemeProvider } from '@/contexts/ThemeContext';
 
 export interface IRootLayout {
