@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
+import type { JSX } from 'react';
 
 import { FormField } from '@/components/form/form-field';
 import { SelectField } from '@/components/form/select-field';
@@ -8,7 +9,7 @@ import { AuthForm } from '@/components/layout/auth-form';
 import { getFirstNameAndLastName } from '@/lib/utils';
 import { type SignUpFormValues, signUpSchema } from '@/lib/validations/sign-up-schema';
 
-export function SignUpForm(): React.JSX.Element {
+export function SignUpForm(): JSX.Element {
   const onSubmit = useCallback((values: SignUpFormValues) => {
     const userName = getFirstNameAndLastName(values.name);
     console.log('🚀 ~ SignUpForm ~ userName:', userName);

@@ -1,7 +1,7 @@
 import type * as SelectPrimitive from '@radix-ui/react-select';
 import { ErrorMessage, useFormikContext } from 'formik';
 import { AlertCircle } from 'lucide-react';
-import * as React from 'react';
+import type { ComponentProps, JSX } from 'react';
 
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
@@ -12,7 +12,7 @@ export interface ISelectOption {
   label: string;
 }
 
-export interface ISelectFieldProps extends React.ComponentProps<typeof SelectPrimitive.Root> {
+export interface ISelectFieldProps extends ComponentProps<typeof SelectPrimitive.Root> {
   options: ISelectOption[];
   placeholder?: string;
   className?: string;
@@ -27,7 +27,7 @@ function SelectField<T extends Record<string, string>>({
   name,
   label,
   ...props
-}: ISelectFieldProps): React.JSX.Element {
+}: ISelectFieldProps): JSX.Element {
   const { setFieldValue, values } = useFormikContext<T>();
 
   return (

@@ -1,5 +1,5 @@
 import { Field, type FieldAttributes } from 'formik';
-import * as React from 'react';
+import type { JSX } from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -8,7 +8,7 @@ export type IInput<T extends Record<string, string>> = FieldAttributes<T>;
 function Input<T extends Record<string, string>>({
   className,
   ...props
-}: IInput<T>): React.JSX.Element {
+}: IInput<T>): JSX.Element {
   return (
     <Field
       data-slot="input"

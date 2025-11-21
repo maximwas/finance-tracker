@@ -1,11 +1,5 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import * as React from 'react';
-
-export default function Dashboard(): React.JSX.Element {
-  return (
-    <div>
-      <p></p>
-    </div>
-  );
+export default function Dashboard(): void {
+  redirect('/dashboard/overview');
 }

@@ -1,9 +1,9 @@
-import { type JSX } from 'react';
+import type { JSX, ReactNode } from 'react';
 
 import { Bubble } from '@/components/ui/bubble';
 
 export interface IAuthLayout {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export default function AuthLayout({ children }: IAuthLayout): JSX.Element {

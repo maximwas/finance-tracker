@@ -1,8 +1,8 @@
 'use client';
 
-import * as React from 'react';
+import type { JSX } from 'react';
 
-export default function Overview(): React.JSX.Element {
+export default function Overview(): JSX.Element {
   return (
     <div>
       <p></p>

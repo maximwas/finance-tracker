@@ -3,7 +3,7 @@
 import { Form, Formik, type FormikProps } from 'formik';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import * as React from 'react';
+import type { JSX, ReactNode } from 'react';
 import type * as Yup from 'yup';
 
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ interface IAuthFormProps<T extends object> {
   redirectText?: string;
   redirectLink?: string;
   redirectLabel?: string;
-  children: React.ReactNode | ((formik: FormikProps<T>) => React.ReactNode);
+  children: ReactNode | ((formik: FormikProps<T>) => ReactNode);
   onSubmit: (values: T) => void | Promise<void>;
 }
 
@@ -29,7 +29,7 @@ function AuthForm<T extends object>({
   redirectLabel,
   children,
   onSubmit,
-}: IAuthFormProps<T>): React.JSX.Element {
+}: IAuthFormProps<T>): JSX.Element {
   return (
     <div className="max-w-md mx-auto">
       <Formik<T>

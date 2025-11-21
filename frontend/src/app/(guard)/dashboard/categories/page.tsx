@@ -1,8 +1,8 @@
 'use client';
 
-import * as React from 'react';
+import type { JSX } from 'react';
 
-export default function Categories(): React.JSX.Element {
+export default function Categories(): JSX.Element {
   return (
     <div>
       <p></p>

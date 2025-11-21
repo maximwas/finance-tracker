@@ -2,7 +2,7 @@
 
 import { ErrorMessage } from 'formik';
 import { AlertCircle } from 'lucide-react';
-import * as React from 'react';
+import type { JSX } from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -29,7 +29,7 @@ function FormField({
   type,
   placeholder,
   as = 'input',
-}: FormFieldProps): React.JSX.Element {
+}: FormFieldProps): JSX.Element {
   return (
     <div className={cn('space-y-2', className)}>
       <Label htmlFor={name}>{label}</Label>

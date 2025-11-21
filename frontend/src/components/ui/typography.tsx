@@ -1,16 +1,16 @@
-import * as React from 'react';
+import type { ComponentProps, JSX } from 'react';
 
 import { cn } from '@/lib/utils';
 
-function TypographyP({ children, className }: React.ComponentProps<'p'>): React.JSX.Element {
+function TypographyP({ children, className }: ComponentProps<'p'>): JSX.Element {
   return <p className={cn(className)}>{children}</p>;
 }
 
-function TypographyH5({ children, className }: React.ComponentProps<'h5'>): React.JSX.Element {
+function TypographyH5({ children, className }: ComponentProps<'h5'>): JSX.Element {
   return <h5 className={cn(className)}>{children}</h5>;
 }
 
-function TypographyH4({ children, className }: React.ComponentProps<'h4'>): React.JSX.Element {
+function TypographyH4({ children, className }: ComponentProps<'h4'>): JSX.Element {
   return <h4 className={cn(className)}>{children}</h4>;
 }
 

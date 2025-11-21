@@ -1,8 +1,8 @@
 'use client';
 
-import * as React from 'react';
+import type { JSX } from 'react';
 
-export default function Settings(): React.JSX.Element {
+export default function Settings(): JSX.Element {
   return (
     <div>
       <p></p>

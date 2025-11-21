@@ -1,17 +1,17 @@
 'use client';
 
 import { Sparkles } from 'lucide-react';
-import type * as React from 'react';
+import type { JSX, ReactNode } from 'react';
 
 import { Logo } from '../logo/logo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 
 export interface IWrapperAuthProps {
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-export function WrapperAuth({ title, children }: IWrapperAuthProps): React.JSX.Element {
+export function WrapperAuth({ title, children }: IWrapperAuthProps): JSX.Element {
   return (
     <Card className="w-full max-w-md relative border-0 shadow-2xl backdrop-blur-sm bg-white/80">
       <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-blue-500 via-purple-500 to-pink-500"></div>

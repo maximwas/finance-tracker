@@ -1,12 +1,12 @@
 'use client';
 
 import { ApolloProvider } from '@apollo/client/react';
-import { type JSX } from 'react';
+import type { JSX, ReactNode } from 'react';
 
 import { initializeApollo } from '@/lib/apolloClient';
 
 export interface IApolloWrapper {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function ApolloWrapper({ children }: IApolloWrapper): JSX.Element {

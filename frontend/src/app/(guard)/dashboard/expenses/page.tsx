@@ -1,8 +1,8 @@
 'use client';
 
-import * as React from 'react';
+import type { JSX } from 'react';
 
-export default function Expenses(): React.JSX.Element {
+export default function Expenses(): JSX.Element {
   return (
     <div>
       <p></p>
