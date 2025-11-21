@@ -4,7 +4,7 @@ import { BarChart3, LayoutDashboard, LogOut, Receipt, Settings, Sparkles, Tag } 
 import { motion } from 'motion/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { type JSX, useLayoutEffect, useRef, useState } from 'react';
+import { type JSX, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -72,48 +72,9 @@ const SIDEBAR_MENU: ISidebarMenu[] = [
 ];
 
 export function AppSidebar(): JSX.Element {
-  const firstRender = useRef(true);
-  const buttonsRef = useRef<HTMLButtonElement[]>([]);
-  const menuRef = useRef<HTMLUListElement>(null);
-
-  const [indicator, setIndicator] = useState({ y: 0, height: 0 });
-  const [background, setBackground] = useState<string>('');
-
   const pathname = usePathname();
-
-  const isActive = (url: string): boolean => url === pathname;
-
-  const setButtons = (element: HTMLButtonElement | null, index: number): void => {
-    if (element) {
-      buttonsRef.current[index] = element;
-    }
-  };
-
-  const moveTo = (index: number): void => {
-    const btn = buttonsRef.current[index];
-    const menu = menuRef.current;
-
-    if (!btn || !menu) return;
-
-    const btnRect = btn.getBoundingClientRect();
-    const menuRect = menu.getBoundingClientRect();
-
-    setIndicator({
-      y: btnRect.top - menuRect.top,
-      height: btnRect.height,
-    });
-
-    setBackground(SIDEBAR_MENU[index].gradient);
-
-    // ❗ Обов’язково: після першого позиціонування виключаємо "перший рендер"
-    firstRender.current = false;
-  };
-
-  // ❗ Важливо — useLayoutEffect, щоб indicator став одразу, без затримки
-  useLayoutEffect(() => {
-    const activeIndex = SIDEBAR_MENU.findIndex((item) => item.url === pathname);
-    if (activeIndex !== -1) moveTo(activeIndex);
-  }, [pathname]);
+  const [optimisticActive, setOptimisticActive] = useState<string | null>(null);
+  const activeUrl = optimisticActive ?? pathname;
 
   return (
     <Sidebar>
@@ -133,9 +94,9 @@ export function AppSidebar(): JSX.Element {
         <SidebarGroup className="p-4">
           <div className="flex items-center gap-3 p-3 rounded-xl bg-linear-to-br from-background/50 to-muted/50 border border-border/50">
             <Avatar className="h-12 w-12 border-2 border-white/50 dark:border-gray-700/50">
-              <AvatarImage src="" alt="IП" />
+              <AvatarImage src="" alt="ІП" />
               <AvatarFallback className="bg-linear-to-br from-blue-500 to-purple-500 text-white">
-                IП
+                ІП
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
@@ -148,40 +109,38 @@ export function AppSidebar(): JSX.Element {
 
         <SidebarGroup className="p-4">
           <SidebarGroupContent>
-            <SidebarMenu ref={menuRef} className="relative gap-5">
-              {/* Анімований indicator */}
-              <motion.div
-                className={cn(
-                  'absolute w-full rounded-xl shadow-lg shadow-primary/25 bg-linear-to-r',
-                  background,
-                )}
-                animate={indicator}
-                transition={
-                  firstRender.current
-                    ? { duration: 0 } // ⛔ без анімації на старті
-                    : {
-                        type: 'spring',
-                        stiffness: 260,
-                        damping: 28,
-                      }
-                }
-              />
+            <SidebarMenu className="relative flex flex-col gap-2">
+              {SIDEBAR_MENU.map((item) => {
+                const isActive = activeUrl === item.url;
+                return (
+                  <div key={item.id} className="relative">
+                    {isActive && (
+                      <motion.div
+                        layoutId="active-indicator"
+                        className={cn(
+                          'w-full h-full rounded-xl absolute overflow-hidden shadow-lg shadow-primary/25 bg-linear-to-r',
+                          item.gradient,
+                        )}
+                        initial={false}
+                        transition={{ type: 'spring', stiffness: 260, damping: 28 }}
+                      />
+                    )}
 
-              {SIDEBAR_MENU.map((item, index) => (
-                <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton
-                    ref={(el) => setButtons(el, index)}
-                    variant={isActive(item.url) ? 'active' : 'default'}
-                    onClick={() => moveTo(index)}
-                    asChild
-                  >
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                    <SidebarMenuItem className="relative z-10">
+                      <SidebarMenuButton
+                        asChild
+                        onClick={() => setOptimisticActive(item.url)}
+                        variant={isActive ? 'active' : 'default'}
+                      >
+                        <Link href={item.url}>
+                          <item.icon className="w-5 h-5" />
+                          <span>{item.label}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </div>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
