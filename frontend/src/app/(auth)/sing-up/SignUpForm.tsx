@@ -1,19 +1,49 @@
 'use client';
 
+import { useBoolean } from 'ahooks';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { omit } from 'radash';
 import type { JSX } from 'react';
 import { useCallback } from 'react';
 
 import { FormField } from '@/components/form/form-field';
 import { SelectField } from '@/components/form/select-field';
 import { AuthForm } from '@/components/layout/auth-form';
+import { useAuth } from '@/contexts/AuthContext';
 import { getFirstNameAndLastName } from '@/lib/utils';
 import { type SignUpFormValues, signUpSchema } from '@/lib/validations/sign-up-schema';
 
 export function SignUpForm(): JSX.Element {
-  const onSubmit = useCallback((values: SignUpFormValues) => {
-    const userName = getFirstNameAndLastName(values.name);
-    console.log('🚀 ~ SignUpForm ~ userName:', userName);
-  }, []);
+  const router = useRouter();
+  const { signUp } = useAuth();
+  const [isSubmit, { setFalse, setTrue }] = useBoolean(false);
+
+  const onSubmit = useCallback(
+    async (values: SignUpFormValues) => {
+      const userName = getFirstNameAndLastName(values.name);
+
+      try {
+        setTrue();
+        const res = await signUp({
+          ...omit(values, ['name']),
+          ...userName,
+        });
+
+        if (res.success) {
+          setFalse();
+          router.replace('/dashboard');
+        }
+      } catch (error: unknown) {
+        setFalse();
+
+        if (axios.isAxiosError(error)) {
+          console.error(error.response?.data?.message || 'Something went wrong');
+        }
+      }
+    },
+    [router, signUp, setFalse, setTrue],
+  );
 
   return (
     <AuthForm<SignUpFormValues>
@@ -28,6 +58,7 @@ export function SignUpForm(): JSX.Element {
         currency: '',
       }}
       validationSchema={signUpSchema}
+      isSubmit={isSubmit}
       onSubmit={onSubmit}
     >
       <div className="space-y-2">

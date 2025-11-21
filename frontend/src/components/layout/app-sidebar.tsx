@@ -7,7 +7,8 @@ import { usePathname } from 'next/navigation';
 import type { ComponentType, JSX, SVGProps } from 'react';
 import { useState } from 'react';
 
-import { cn } from '@/lib/utils';
+import { AuthLoader, useAuth } from '@/contexts/AuthContext';
+import { cn, getInitial } from '@/lib/utils';
 
 import { Logo } from '../logo/logo';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -74,9 +75,14 @@ const SIDEBAR_MENU: ISidebarMenu[] = [
 
 export function AppSidebar(): JSX.Element {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
   const [optimisticActive, setOptimisticActive] = useState<string | null>(pathname);
 
   const isActive = (url: string): boolean => optimisticActive === url;
+
+  if (!user) {
+    return <AuthLoader />;
+  }
 
   return (
     <Sidebar>
@@ -98,11 +104,13 @@ export function AppSidebar(): JSX.Element {
             <Avatar className="h-12 w-12 border-2 border-white/50 dark:border-gray-700/50">
               <AvatarImage src="" alt="ІП" />
               <AvatarFallback className="bg-linear-to-br from-blue-500 to-purple-500 text-white">
-                ІП
+                {getInitial(user.firstName, user.lastName)}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm truncate text-foreground">Іван Петренко</p>
+              <p className="text-sm truncate text-foreground">
+                {`${user.firstName} ${user.lastName}`}
+              </p>
             </div>
           </div>
         </SidebarGroup>
@@ -155,6 +163,7 @@ export function AppSidebar(): JSX.Element {
         <Button
           variant="ghost"
           className="w-full justify-start gap-3 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20 group"
+          onClick={logout}
         >
           <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-300" />
           <span>Logout</span>

@@ -1,15 +1,20 @@
 import axios from 'axios';
 
+import { type IUserName } from './utils';
 import { type SignUpFormValues } from './validations/sign-up-schema';
 import { type SingInFormValues } from './validations/sing-in-schema';
 
-export interface AuthResponse {
+export interface ApiResponse<T = unknown> {
+  data?: T;
   message: string;
+  success: boolean;
+  timestamp: string;
+  requestId: string;
 }
 
 export interface User {
   id: string;
-  fistName: string;
+  firstName: string;
   lastName: string;
 }
 
@@ -18,11 +23,14 @@ const authClient = axios.create({
   withCredentials: true,
 });
 
-export const getUser = async (isSSR: boolean = false): Promise<User> => {
-  if (isSSR) {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/me`, {
+export const getUser = async (cookie?: string): Promise<ApiResponse<User>> => {
+  if (cookie) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/api/auth/me`, {
       method: 'GET',
       credentials: 'include',
+      headers: {
+        Cookie: cookie,
+      },
     });
 
     const data = await response.json();
@@ -30,25 +38,27 @@ export const getUser = async (isSSR: boolean = false): Promise<User> => {
     return data;
   }
 
-  const response = await authClient.get<User>('/me');
+  const response = await authClient.get<ApiResponse<User>>('/me');
 
   return response.data;
 };
 
-export const signUp = async (body: SignUpFormValues): Promise<AuthResponse> => {
-  const response = await authClient.post<AuthResponse>('/signup', body);
+export const signUp = async (
+  body: Omit<SignUpFormValues, 'name'> & IUserName,
+): Promise<ApiResponse> => {
+  const response = await authClient.post<ApiResponse>('/signup', body);
 
   return response.data;
 };
 
-export const signIn = async (body: SingInFormValues): Promise<AuthResponse> => {
-  const response = await authClient.post<AuthResponse>('/login', body);
+export const signIn = async (body: SingInFormValues): Promise<ApiResponse> => {
+  const response = await authClient.post<ApiResponse>('/login', body);
 
   return response.data;
 };
 
-export const logout = async (): Promise<AuthResponse> => {
-  const response = await authClient.post<AuthResponse>('/logout');
+export const logout = async (): Promise<ApiResponse> => {
+  const response = await authClient.post<ApiResponse>('/logout');
 
   return response.data;
 };
