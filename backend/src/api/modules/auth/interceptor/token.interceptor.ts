@@ -7,6 +7,10 @@ import {
 import type { Response } from 'express';
 import ms from 'ms';
 import { map, Observable, tap } from 'rxjs';
+import {
+  EXPIRES_AT_ACCESS_TOKEN,
+  EXPIRES_AT_REFRESH_TOKEN,
+} from 'src/api/constants';
 import { ConfigService } from 'src/common/modules/config/config.service';
 
 import { AuthPayload, AuthPayloadProp } from '../types/token.type';
@@ -18,7 +22,7 @@ export class TokenInterceptor implements NestInterceptor {
   intercept(
     context: ExecutionContext,
     next: CallHandler<AuthPayload>,
-  ): Observable<Pick<AuthPayload, AuthPayloadProp.AccessToken>> {
+  ): Observable<null> {
     const ctx = context.switchToHttp();
     const res = ctx.getResponse<Response<AuthPayload>>();
 
@@ -32,14 +36,25 @@ export class TokenInterceptor implements NestInterceptor {
               httpOnly: true,
               sameSite: 'lax',
               secure: this.configService.isProduction(),
-              maxAge: ms('7d'),
+              maxAge: ms(EXPIRES_AT_REFRESH_TOKEN),
+            },
+          );
+        }
+
+        if (authPayload[AuthPayloadProp.AccessToken]) {
+          res.cookie(
+            this.configService.getAccessTokenKey(),
+            authPayload[AuthPayloadProp.AccessToken],
+            {
+              httpOnly: true,
+              sameSite: 'lax',
+              secure: this.configService.isProduction(),
+              maxAge: ms(EXPIRES_AT_ACCESS_TOKEN),
             },
           );
         }
       }),
-      map((authPayload: AuthPayload) => ({
-        [AuthPayloadProp.AccessToken]: authPayload[AuthPayloadProp.AccessToken],
-      })),
+      map(() => null),
     );
   }
 }

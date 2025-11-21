@@ -4,33 +4,36 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { GqlContextType } from '@nestjs/graphql';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiResponse } from 'src/common/dto/api-response-dto';
 
-type UnifiedResponse<T = unknown> =
-  | ApiResponse<T>
-  | { data: T; extensions: ApiResponse<T> };
+import { MESSAGE_META_KEY } from '../reflector/message.reflector';
 
 @Injectable()
-export class TransformResponseInterceptor<T = unknown>
+export class GlobalTransformResponseInterceptor<T = unknown>
   implements NestInterceptor<T>
 {
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler,
-  ): Observable<UnifiedResponse<T>> {
+  constructor(private reflector: Reflector) {}
+
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
+    const message = this.reflector.get<string>(
+      MESSAGE_META_KEY,
+      context.getHandler(),
+    );
+
     return next.handle().pipe(
       map((data: T) => {
         const isGraphQL = context.getType<GqlContextType>() === 'graphql';
         const response = new ApiResponse<T>({
           data,
-          message: 'OK',
+          message,
           success: true,
         });
 
-        return isGraphQL ? { data, extensions: response } : response;
+        return isGraphQL ? data : response;
       }),
     );
   }

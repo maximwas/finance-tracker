@@ -3,7 +3,7 @@
 import { ApolloProvider } from '@apollo/client/react';
 import type { JSX, ReactNode } from 'react';
 
-import { initializeApollo } from '@/lib/apolloClient';
+import { initializeApollo } from '@/lib/apollo-client';
 
 export interface IApolloWrapper {
   children: ReactNode;

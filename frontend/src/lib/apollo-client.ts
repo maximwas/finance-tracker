@@ -5,7 +5,8 @@ let apolloClient: ApolloClient;
 
 function createApolloClient(): ApolloClient {
   const httpLink = new HttpLink({
-    uri: 'http://localhost:3003/graphql',
+    uri: `${process.env.NEXT_PUBLIC_BACKEND_URL}/graphql`,
+    credentials: 'include',
     fetch,
   });
 

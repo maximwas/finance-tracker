@@ -1,6 +1,7 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsString,
   Matches,
   MaxLength,
   MinLength,
@@ -44,4 +45,8 @@ export class SignupDto {
     message: 'Last name must be at least 128 characters long',
   })
   lastName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  currency: string;
 }

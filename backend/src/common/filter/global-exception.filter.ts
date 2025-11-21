@@ -10,7 +10,7 @@ import { Response } from 'express';
 import { ApiResponse } from 'src/common/dto/api-response-dto';
 
 @Catch()
-export class AllExceptionsFilter implements ExceptionFilter {
+export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): ApiResponse | undefined {
     const ctx = host.switchToHttp();
 
@@ -25,11 +25,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         : 'Internal server error';
 
     const message =
-      typeof response === 'string'
-        ? response
-        : Array.isArray(response['message'])
-          ? response['message'].join(', ')
-          : (response['message'] as string) || 'Internal server error';
+      typeof response === 'string' ? response : (response['message'] as string);
 
     Logger.error(exception);
 

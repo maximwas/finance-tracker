@@ -30,6 +30,10 @@ export class ConfigService extends ConfigServiceNest {
     return this.getOrThrow<string>('REFRESH_TOKEN_KEY');
   }
 
+  public getAccessTokenKey(): string {
+    return this.getOrThrow<string>('ACCESS_TOKEN_KEY');
+  }
+
   public getSSRSecret(): string {
     return this.getOrThrow<string>('SSR_SECRET');
   }

@@ -5,6 +5,7 @@ import '../styles/globals.css';
 import type { JSX, ReactNode } from 'react';
 
 import { ApolloWrapper } from '@/components/apollo/apollo-wrapper';
+import { AuthProvider } from '@/contexts/AuthContext';
 import { Theme, ThemeProvider } from '@/contexts/ThemeContext';
 
 export interface IRootLayout {
@@ -15,10 +16,12 @@ export default function RootLayout({ children }: IRootLayout): JSX.Element {
   return (
     <html lang="en">
       <body cz-shortcut-listen="true">
-        <ThemeProvider defaultTheme={Theme.Light}>
-          {/* <ApolloWrapper>{children}</ApolloWrapper> */}
-          {children}
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider defaultTheme={Theme.Light}>
+            {/* <ApolloWrapper>{children}</ApolloWrapper> */}
+            {children}
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

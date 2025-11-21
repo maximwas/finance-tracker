@@ -17,6 +17,7 @@ import {
   HEADER_SIGNATURE_SSR,
   HEADER_TIMES_SSR,
 } from 'src/api/constants';
+import { Message } from 'src/common/reflector/message.reflector';
 import { getCookie } from 'src/common/utils/get-cookie';
 import { getHeader } from 'src/common/utils/get-header';
 
@@ -41,6 +42,7 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   @Post('signup')
   @UseInterceptors(TokenInterceptor)
+  @Message('Register successful')
   signup(@Body() signupDto: SignupDto): Promise<AuthPayload> {
     return this.authService.signup(signupDto);
   }
@@ -48,6 +50,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Get('refresh')
   @UseInterceptors(TokenInterceptor)
+  @Message('Refresh token successful')
   refresh(@Req() req: Request): Promise<AuthPayload> {
     const isSSR = getHeader<string>(req.headers, HEADER_REQUEST_SSR) === 'true';
     const times = getHeader<string>(req.headers, HEADER_TIMES_SSR);
@@ -69,6 +72,7 @@ export class AuthController {
   @Post('login')
   @UseGuards(LocalAuthGuard)
   @UseInterceptors(TokenInterceptor)
+  @Message('Login successful')
   login(@Req() req: Request, @CurrentUser() user: User): Promise<AuthPayload> {
     const refreshToken = getCookie(
       req.cookies,
@@ -78,6 +82,16 @@ export class AuthController {
     return this.authService.login(user, refreshToken);
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Get('me')
+  @UseGuards(LocalAuthGuard)
+  me(
+    @CurrentUser() user: User,
+  ): Promise<Pick<User, 'id' | 'firstName' | 'lastName'>> {
+    return this.authService.me(user.id);
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Get('logout')
   async logout(@Req() req: Request, @Res() res: Response): Promise<void> {
     const refreshToken = getCookie(
@@ -90,6 +104,5 @@ export class AuthController {
     }
 
     res.clearCookie(this.configService.getRefreshTokenKey());
-    res.status(HttpStatus.NO_CONTENT).send();
   }
 }

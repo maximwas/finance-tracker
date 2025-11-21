@@ -2,7 +2,7 @@ import * as motion from 'motion/react-client';
 import { type JSX } from 'react';
 
 import { cn } from '@/lib/utils';
-import { type DefaultUIProps } from '@/types/defaultProps';
+import { type DefaultUIProps } from '@/types/default-props.type';
 
 export interface IBubbleProps extends DefaultUIProps {
   animationDelay?: number;

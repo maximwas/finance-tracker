@@ -1,10 +1,10 @@
 import { ValidationPipe, VersioningType } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
-import { AllExceptionsFilter } from './common/filter/all-exceptions.filter';
-import { TransformResponseInterceptor } from './common/interceptor/transform-response.interceptor';
+import { GlobalExceptionFilter } from './common/filter/global-exception.filter';
+import { GlobalTransformResponseInterceptor } from './common/interceptor/global-transform-response.interceptor';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -15,8 +15,10 @@ async function bootstrap(): Promise<void> {
   });
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
-  // app.useGlobalInterceptors(new TransformResponseInterceptor());
-  // app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalInterceptors(
+    new GlobalTransformResponseInterceptor(new Reflector()),
+  );
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   await app.listen(process.env.PORT ?? 3000);
 

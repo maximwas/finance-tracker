@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -142,6 +143,18 @@ export class AuthService {
     const hashed = hash(token, this.configService.getRefreshTokenSecret());
 
     await this.refreshTokenService.revoke(hashed);
+  }
+
+  public async me(
+    userId: string,
+  ): Promise<Pick<User, 'id' | 'firstName' | 'lastName'>> {
+    const user = await this.userService.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return pick(user, ['id', 'firstName', 'lastName']);
   }
 
   private async generateTokens(jwtPayload: JWTPayload): Promise<AuthPayload> {
