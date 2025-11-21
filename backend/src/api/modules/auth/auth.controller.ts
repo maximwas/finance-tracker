@@ -23,6 +23,7 @@ import { getHeader } from 'src/common/utils/get-header';
 
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
+import { JWTAuthGuard } from './guard/jwt-auth.guard';
 import { LocalAuthGuard } from './guard/local-auth.guard';
 import { TokenInterceptor } from './interceptor/token.interceptor';
 import { AuthPayload } from './types/token.type';
@@ -31,7 +32,7 @@ import { CurrentUser } from '../../../graphql/modules/user/decorator/user.decora
 
 @Controller({
   version: '1',
-  path: 'auth',
+  path: '/api/auth',
 })
 export class AuthController {
   constructor(
@@ -84,7 +85,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Get('me')
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(JWTAuthGuard)
   @Message('Get user info successful')
   me(
     @CurrentUser() user: User,

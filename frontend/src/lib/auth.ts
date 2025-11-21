@@ -14,13 +14,13 @@ export interface User {
 }
 
 const authClient = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth`,
+  baseURL: `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/api/auth`,
   withCredentials: true,
 });
 
 export const getUser = async (isSSR: boolean = false): Promise<User> => {
   if (isSSR) {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/me`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/me`, {
       method: 'GET',
       credentials: 'include',
     });
