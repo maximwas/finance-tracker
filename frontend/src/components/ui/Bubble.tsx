@@ -1,3 +1,4 @@
+import * as motion from 'motion/react-client';
 import { type JSX } from 'react';
 
 import { cn } from '@/lib/utils';
@@ -9,14 +10,19 @@ export interface IBubbleProps extends DefaultUIProps {
 
 export function Bubble({ className, animationDelay }: IBubbleProps): JSX.Element {
   return (
-    <div
+    <motion.div
+      animate={{
+        y: [0, -20, 0],
+      }}
+      transition={{
+        repeat: Infinity,
+        duration: 3,
+        delay: animationDelay,
+      }}
       className={cn(
-        'absolute rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float',
+        'absolute rounded-full mix-blend-multiply filter blur-xl opacity-20',
         className,
       )}
-      style={{
-        animationDelay: `${animationDelay || 0}s`,
-      }}
-    ></div>
+    ></motion.div>
   );
 }

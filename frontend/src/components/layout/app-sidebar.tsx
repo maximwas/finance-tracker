@@ -1,5 +1,6 @@
 'use client';
 
+import { DialogTitle } from '@radix-ui/react-dialog';
 import { BarChart3, LayoutDashboard, LogOut, Receipt, Settings, Sparkles, Tag } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
@@ -11,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { Logo } from '../logo/logo';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
+import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
 import {
   Sidebar,
   SidebarContent,
@@ -73,16 +75,17 @@ const SIDEBAR_MENU: ISidebarMenu[] = [
 
 export function AppSidebar(): JSX.Element {
   const pathname = usePathname();
-  const [optimisticActive, setOptimisticActive] = useState<string | null>(null);
-  const activeUrl = optimisticActive ?? pathname;
+  const [optimisticActive, setOptimisticActive] = useState<string | null>(pathname);
+
+  const isActive = (url: string): boolean => optimisticActive === url;
 
   return (
     <Sidebar>
       <SidebarHeader className="flex-row gap-2 p-4">
         <Logo width={25} height={25} />
         <div className="flex flex-col justify-center gap-1">
-          <TypographyH5 className="text-base bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent flex gap-2 items-center">
-            FinTracker <Sparkles className="w-5 h-5 text-purple-500" />
+          <TypographyH5 className="text-base font-medium bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent flex gap-2 items-center">
+            FinTracker <Sparkles className="w-5 h-5 text-purple-500 font-bold" />
           </TypographyH5>
           <TypographyP className="text-xs text-muted-foreground">Smart Finance</TypographyP>
         </div>
@@ -110,37 +113,38 @@ export function AppSidebar(): JSX.Element {
         <SidebarGroup className="p-4">
           <SidebarGroupContent>
             <SidebarMenu className="relative flex flex-col gap-2">
-              {SIDEBAR_MENU.map((item) => {
-                const isActive = activeUrl === item.url;
-                return (
-                  <div key={item.id} className="relative">
-                    {isActive && (
-                      <motion.div
-                        layoutId="active-indicator"
-                        className={cn(
-                          'w-full h-full rounded-xl absolute overflow-hidden shadow-lg shadow-primary/25 bg-linear-to-r',
-                          item.gradient,
-                        )}
-                        initial={false}
-                        transition={{ type: 'spring', stiffness: 260, damping: 28 }}
-                      />
-                    )}
+              {SIDEBAR_MENU.map((item) => (
+                <div key={item.id} className="relative">
+                  {isActive(item.url) && (
+                    <motion.div
+                      layoutId="active-indicator"
+                      className={cn(
+                        'w-full h-full rounded-xl absolute overflow-hidden shadow-lg shadow-primary/25 bg-linear-to-r',
+                        item.gradient,
+                      )}
+                      initial={false}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 260,
+                        damping: 28,
+                      }}
+                    />
+                  )}
 
-                    <SidebarMenuItem className="relative z-10">
-                      <SidebarMenuButton
-                        asChild
-                        onClick={() => setOptimisticActive(item.url)}
-                        variant={isActive ? 'active' : 'default'}
-                      >
-                        <Link href={item.url}>
-                          <item.icon className="w-5 h-5" />
-                          <span>{item.label}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </div>
-                );
-              })}
+                  <SidebarMenuItem className="relative z-10">
+                    <SidebarMenuButton
+                      asChild
+                      onClick={() => setOptimisticActive(item.url)}
+                      variant={isActive(item.url) ? 'active' : 'default'}
+                    >
+                      <Link href={item.url}>
+                        <item.icon className="w-5 h-5 group-hover:scale-110 transition-all" />
+                        <span>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </div>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
