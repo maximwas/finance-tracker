@@ -85,6 +85,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Get('me')
   @UseGuards(LocalAuthGuard)
+  @Message('Get user info successful')
   me(
     @CurrentUser() user: User,
   ): Promise<Pick<User, 'id' | 'firstName' | 'lastName'>> {
@@ -93,6 +94,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Get('logout')
+  @Message('logout successful')
   async logout(@Req() req: Request, @Res() res: Response): Promise<void> {
     const refreshToken = getCookie(
       req.cookies,
