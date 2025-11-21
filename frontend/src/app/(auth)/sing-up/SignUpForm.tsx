@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback } from 'react';
 import type { JSX } from 'react';
+import { useCallback } from 'react';
 
 import { FormField } from '@/components/form/form-field';
 import { SelectField } from '@/components/form/select-field';

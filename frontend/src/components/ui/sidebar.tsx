@@ -3,8 +3,8 @@
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { PanelLeftIcon } from 'lucide-react';
-import * as React from 'react';
 import type { JSX } from 'react';
+import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -239,7 +239,11 @@ function Sidebar({
   );
 }
 
-function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<typeof Button>): JSX.Element {
+function SidebarTrigger({
+  className,
+  onClick,
+  ...props
+}: React.ComponentProps<typeof Button>): JSX.Element {
   const { toggleSidebar } = useSidebar();
 
   return (
@@ -333,7 +337,10 @@ function SidebarFooter({ className, ...props }: React.ComponentProps<'div'>): JS
   );
 }
 
-function SidebarSeparator({ className, ...props }: React.ComponentProps<typeof Separator>): JSX.Element {
+function SidebarSeparator({
+  className,
+  ...props
+}: React.ComponentProps<typeof Separator>): JSX.Element {
   return (
     <Separator
       data-slot="sidebar-separator"

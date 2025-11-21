@@ -1,19 +1,17 @@
 'use client';
 
-import { DialogTitle } from '@radix-ui/react-dialog';
 import { BarChart3, LayoutDashboard, LogOut, Receipt, Settings, Sparkles, Tag } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
 import type { ComponentType, JSX, SVGProps } from 'react';
+import { useState } from 'react';
 
 import { cn } from '@/lib/utils';
 
 import { Logo } from '../logo/logo';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
 import {
   Sidebar,
   SidebarContent,

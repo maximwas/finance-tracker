@@ -5,10 +5,7 @@ import { cn } from '@/lib/utils';
 
 export type IInput<T extends Record<string, string>> = FieldAttributes<T>;
 
-function Input<T extends Record<string, string>>({
-  className,
-  ...props
-}: IInput<T>): JSX.Element {
+function Input<T extends Record<string, string>>({ className, ...props }: IInput<T>): JSX.Element {
   return (
     <Field
       data-slot="input"

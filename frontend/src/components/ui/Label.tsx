@@ -3,10 +3,7 @@ import type { ComponentProps, JSX } from 'react';
 
 import { cn } from '@/lib/utils';
 
-function Label({
-  className,
-  ...props
-}: ComponentProps<typeof LabelPrimitive.Root>): JSX.Element {
+function Label({ className, ...props }: ComponentProps<typeof LabelPrimitive.Root>): JSX.Element {
   return (
     <LabelPrimitive.Root
       data-slot="label"

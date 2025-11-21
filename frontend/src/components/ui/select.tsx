@@ -4,21 +4,15 @@ import type { ComponentProps, JSX } from 'react';
 
 import { cn } from '@/lib/utils';
 
-function Select({
-  ...props
-}: ComponentProps<typeof SelectPrimitive.Root>): JSX.Element {
+function Select({ ...props }: ComponentProps<typeof SelectPrimitive.Root>): JSX.Element {
   return <SelectPrimitive.Root data-slot="select" {...props} />;
 }
 
-function SelectGroup({
-  ...props
-}: ComponentProps<typeof SelectPrimitive.Group>): JSX.Element {
+function SelectGroup({ ...props }: ComponentProps<typeof SelectPrimitive.Group>): JSX.Element {
   return <SelectPrimitive.Group data-slot="select-group" {...props} />;
 }
 
-function SelectValue({
-  ...props
-}: ComponentProps<typeof SelectPrimitive.Value>): JSX.Element {
+function SelectValue({ ...props }: ComponentProps<typeof SelectPrimitive.Value>): JSX.Element {
   return <SelectPrimitive.Value data-slot="select-value" {...props} />;
 }
 
