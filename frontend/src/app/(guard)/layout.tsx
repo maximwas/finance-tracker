@@ -14,7 +14,7 @@ export interface IDashboardLayout {
 export default async function GuardLayout({ children }: IDashboardLayout): Promise<JSX.Element> {
   const cookie = await cookies();
   const user = await getUser({
-    isSSR: true,
+    mode: 'ssr',
     cookie: cookie.toString(),
   });
 

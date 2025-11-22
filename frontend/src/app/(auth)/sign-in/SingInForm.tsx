@@ -20,7 +20,7 @@ export function SingInForm(): JSX.Element {
         const res = await signIn(values);
 
         if (res.success) {
-          router.replace('/dashboard/overview');
+          router.replace('/dashboard');
         }
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {

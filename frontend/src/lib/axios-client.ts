@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { redirect } from 'next/navigation';
+
+import { refreshAccessToken } from '@/service/auth';
 
 export const axiosClient = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_BACKEND_URL}/v1/api`,
@@ -7,15 +8,6 @@ export const axiosClient = axios.create({
 });
 
 let isRefreshing = false;
-
-async function refreshTokensClient(): Promise<boolean> {
-  try {
-    await axiosClient.get('/auth/refresh');
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 axiosClient.interceptors.response.use(
   (res) => res,
@@ -25,16 +17,16 @@ axiosClient.interceptors.response.use(
     if (status === 401 && !isRefreshing) {
       isRefreshing = true;
 
-      const refreshed = await refreshTokensClient();
-
-      isRefreshing = false;
-
-      if (refreshed) {
+      try {
+        await refreshAccessToken({ mode: 'client' });
         const originalRequest = error.config;
-        return axiosClient(originalRequest);
-      }
 
-      redirect('/sign-in');
+        return axiosClient(originalRequest);
+      } catch {
+        window.location.href = '/sign-in';
+      } finally {
+        isRefreshing = false;
+      }
     }
 
     throw error;

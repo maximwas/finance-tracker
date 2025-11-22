@@ -1,33 +1,26 @@
 import { type ApiResponse } from '@/types/api';
+import { type IGetUserOptions, type User } from '@/types/user';
 
 import { axiosClient } from './axios-client';
 import { axiosSSR } from './axios-ssr';
 
-export interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-}
+export const getUser = async ({ mode, cookie }: IGetUserOptions): Promise<ApiResponse<User>> => {
+  switch (mode) {
+    case 'ssr': {
+      const response = await axiosSSR.get<ApiResponse<User>>('/auth/me', {
+        headers: {
+          Cookie: cookie || '',
+        },
+      });
 
-export interface IGetUserOptions {
-  cookie?: string;
-  isSSR?: boolean;
-}
+      return response.data;
+    }
+    case 'client': {
+      const response = await axiosClient.get<ApiResponse<User>>('/auth/me');
 
-export const getUser = async ({ isSSR, cookie }: IGetUserOptions = {}): Promise<
-  ApiResponse<User>
-> => {
-  if (isSSR) {
-    const response = await axiosSSR.get<ApiResponse<User>>('/auth/me', {
-      headers: {
-        Cookie: cookie || '',
-      },
-    });
-
-    return response.data;
+      return response.data;
+    }
+    default:
+      throw new Error('Unknown mode');
   }
-
-  const response = await axiosClient.get<ApiResponse<User>>('/auth/me');
-
-  return response.data;
 };

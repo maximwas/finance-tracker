@@ -25,7 +25,7 @@ export function SignUpForm(): JSX.Element {
         const res = await signUp({ ...omit(values, ['name']), ...userName });
 
         if (res.success) {
-          router.replace('/dashboard/overview');
+          router.replace('/dashboard');
         }
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {

@@ -2,8 +2,8 @@
 
 import { createContext, type JSX, useContext, useState } from 'react';
 
-import { type User } from '@/lib/user';
 import { type DefaultUIProps } from '@/types/default-props.type';
+import { type User } from '@/types/user';
 
 export interface IUserContextProps extends DefaultUIProps {
   initialUser: User | null;

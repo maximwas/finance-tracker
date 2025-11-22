@@ -1,7 +1,8 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { refreshAccessTokenSSR } from './lib/auth';
+import { AuthPayloadProp } from '../../shared/types/token.type';
+import { refreshAccessToken } from './service/auth';
 import { isTokenValid } from './utils/jwt';
 
 const DASHBOARD_ENTRY = '/dashboard';
@@ -28,28 +29,34 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   let isAccessValid = isGuardRoute && isTokenValid(accessToken);
   const isRefreshValid = isGuardRoute && isTokenValid(refreshToken);
 
-  if (isGuardRoute && !isAccessValid && isRefreshValid && refreshToken) {
+  if (isGuardRoute && !isAccessValid && isRefreshValid) {
     try {
-      const newAccessToken = await refreshAccessTokenSSR(refreshToken);
+      const authPayload = await refreshAccessToken({ mode: 'server' });
       const response = NextResponse.next();
 
       isAccessValid = true;
 
       response.cookies.set({
         name: process.env.NEXT_ACCESS_TOKEN_KEY!,
-        value: newAccessToken,
+        value: authPayload[AuthPayloadProp.AccessToken],
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         httpOnly: process.env.NODE_ENV === 'production',
       });
 
-      return response;
+      response.cookies.set({
+        name: process.env.NEXT_REFRESH_TOKEN_KEY!,
+        value: authPayload[AuthPayloadProp.RefreshToken],
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        httpOnly: process.env.NODE_ENV === 'production',
+      });
     } catch {
       return redirectToSignIn(request);
     }
   }
 
-  const isAuthenticated = isAccessValid || isRefreshValid;
+  const isAuthenticated = isAccessValid && isRefreshValid;
 
   if (isGuardRoute && !isAuthenticated) {
     return redirectToSignIn(request);
@@ -57,6 +64,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   if (isAuthRoute && isAuthenticated) {
     const dashboardUrl = new URL(DASHBOARD_ENTRY, request.url);
+
     return NextResponse.redirect(dashboardUrl);
   }
 
