@@ -8,7 +8,8 @@ import type { ComponentType, JSX, SVGProps } from 'react';
 import { useState } from 'react';
 
 import { useAuth } from '@/contexts/AuthContext';
-import { cn, getInitial } from '@/lib/utils';
+import { cn } from '@/utils/cn';
+import { getInitial } from '@/utils/name';
 
 import { Logo } from '../logo/logo';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';

@@ -1,13 +1,6 @@
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
 export interface IUserName {
   firstName: string;
   lastName: string;
-}
-
-export function cn(...inputs: ClassValue[]): string {
-  return twMerge(clsx(inputs));
 }
 
 export function getFirstNameAndLastName(fullName: string): IUserName {

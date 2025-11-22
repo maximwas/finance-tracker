@@ -4,7 +4,7 @@ import { ErrorMessage } from 'formik';
 import { AlertCircle } from 'lucide-react';
 import type { JSX } from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/cn';
 
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';

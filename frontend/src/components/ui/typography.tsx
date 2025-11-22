@@ -1,6 +1,6 @@
 import type { ComponentProps, JSX } from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/cn';
 
 function TypographyP({ children, className }: ComponentProps<'p'>): JSX.Element {
   return <p className={cn(className)}>{children}</p>;

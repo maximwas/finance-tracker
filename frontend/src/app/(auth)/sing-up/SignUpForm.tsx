@@ -10,8 +10,8 @@ import { FormField } from '@/components/form/form-field';
 import { SelectField } from '@/components/form/select-field';
 import { AuthForm } from '@/components/layout/auth-form';
 import { useAuth } from '@/contexts/AuthContext';
-import { getFirstNameAndLastName } from '@/lib/utils';
 import { type SignUpFormValues, signUpSchema } from '@/lib/validations/sign-up-schema';
+import { getFirstNameAndLastName } from '@/utils/name';
 
 export function SignUpForm(): JSX.Element {
   const router = useRouter();

@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-import { type IUserName } from './utils';
+import { type IUserName } from '@/utils/name';
+
 import { type SignUpFormValues } from './validations/sign-up-schema';
 import { type SingInFormValues } from './validations/sing-in-schema';
 
