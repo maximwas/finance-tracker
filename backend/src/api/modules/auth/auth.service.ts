@@ -130,6 +130,7 @@ export class AuthService {
 
   public async login(user: User, token: string | null): Promise<AuthPayload> {
     const tokens = await this.generateTokens(pick(user, ['id', 'email']));
+
     if (token) {
       const hashed = hash(token, this.configService.getRefreshTokenSecret());
 

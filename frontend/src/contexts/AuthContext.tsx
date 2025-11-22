@@ -1,7 +1,8 @@
 'use client';
 
 import { useRequest } from 'ahooks';
-import { createContext, type JSX, useContext, useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { createContext, type JSX, useCallback, useContext, useEffect, useState } from 'react';
 
 import { Spinner } from '@/components/ui/spinner';
 import {
@@ -15,6 +16,7 @@ import {
 import { type IUserName } from '@/lib/utils';
 import { type SignUpFormValues } from '@/lib/validations/sign-up-schema';
 import { type SingInFormValues } from '@/lib/validations/sing-in-schema';
+import { PROTECTED_ROUTES } from '@/middleware';
 import { type DefaultUIProps } from '@/types/default-props.type';
 
 export interface IAuthContextProps {
@@ -35,8 +37,11 @@ export function AuthLoader(): JSX.Element {
 }
 
 export function AuthProvider({ children }: DefaultUIProps): JSX.Element {
+  const pathname = usePathname();
   const [user, setUser] = useState<User | undefined>(undefined);
-  const { data, loading, refresh, error } = useRequest(getUser);
+  const { data, loading, error, run } = useRequest(getUser, {
+    manual: true,
+  });
 
   useEffect(() => {
     if (data?.data) {
@@ -46,33 +51,39 @@ export function AuthProvider({ children }: DefaultUIProps): JSX.Element {
     }
   }, [data, error]);
 
-  const signUp = async (body: Omit<SignUpFormValues, 'name'> & IUserName): Promise<ApiResponse> => {
-    const response = await signUpAuth(body);
+  useEffect(() => {
+    const isProtected = PROTECTED_ROUTES.some((path) => pathname.startsWith(path));
 
-    if (response.success) refresh();
+    if (isProtected && !user) {
+      run();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [run, pathname]);
 
-    return response;
-  };
+  const signUp = useCallback(
+    async (body: Omit<SignUpFormValues, 'name'> & IUserName): Promise<ApiResponse> => {
+      const response = await signUpAuth(body);
 
-  const signIn = async (body: SingInFormValues): Promise<ApiResponse> => {
+      return response;
+    },
+    [],
+  );
+
+  const signIn = useCallback(async (body: SingInFormValues): Promise<ApiResponse> => {
     const response = await signInAuth(body);
 
-    if (response.success) refresh();
-
     return response;
-  };
+  }, []);
 
-  const logout = async (): Promise<ApiResponse> => {
+  const logout = useCallback(async (): Promise<ApiResponse> => {
     const response = await logoutAuth();
 
-    if (response.success) refresh();
+    if (response.success) {
+      setUser(undefined);
+    }
 
     return response;
-  };
-
-  if (loading) {
-    return <AuthLoader />;
-  }
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -83,7 +94,7 @@ export function AuthProvider({ children }: DefaultUIProps): JSX.Element {
         logout,
       }}
     >
-      {children}
+      {loading ? <AuthLoader /> : children}
     </AuthContext.Provider>
   );
 }

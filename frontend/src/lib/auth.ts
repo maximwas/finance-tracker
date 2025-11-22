@@ -58,7 +58,7 @@ export const signIn = async (body: SingInFormValues): Promise<ApiResponse> => {
 };
 
 export const logout = async (): Promise<ApiResponse> => {
-  const response = await authClient.post<ApiResponse>('/logout');
+  const response = await authClient.get<ApiResponse>('/logout');
 
   return response.data;
 };

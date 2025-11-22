@@ -1,6 +1,5 @@
 'use client';
 
-import { useBoolean } from 'ahooks';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { omit } from 'radash';
@@ -17,53 +16,45 @@ import { type SignUpFormValues, signUpSchema } from '@/lib/validations/sign-up-s
 export function SignUpForm(): JSX.Element {
   const router = useRouter();
   const { signUp } = useAuth();
-  const [isSubmit, { setFalse, setTrue }] = useBoolean(false);
 
   const onSubmit = useCallback(
     async (values: SignUpFormValues) => {
       const userName = getFirstNameAndLastName(values.name);
 
       try {
-        setTrue();
-        const res = await signUp({
-          ...omit(values, ['name']),
-          ...userName,
-        });
+        const res = await signUp({ ...omit(values, ['name']), ...userName });
 
         if (res.success) {
-          setFalse();
-          router.replace('/dashboard');
+          router.replace('/dashboard/overview');
         }
       } catch (error: unknown) {
-        setFalse();
-
         if (axios.isAxiosError(error)) {
           console.error(error.response?.data?.message || 'Something went wrong');
         }
       }
     },
-    [router, signUp, setFalse, setTrue],
+    [router, signUp],
   );
 
   return (
     <AuthForm<SignUpFormValues>
-      submitText="Sing up"
+      submitText="Sign Up"
       redirectText="Already have an account?"
       redirectLink="/sing-in"
       redirectLabel="Sign In"
       initialValues={{
+        name: '',
         email: '',
         password: '',
-        name: '',
         currency: '',
       }}
       validationSchema={signUpSchema}
-      isSubmit={isSubmit}
       onSubmit={onSubmit}
     >
       <div className="space-y-2">
         <FormField label="Name" id="name" name="name" type="text" placeholder="John Doe" />
       </div>
+
       <div className="space-y-2">
         <FormField
           label="Email"
@@ -83,6 +74,7 @@ export function SignUpForm(): JSX.Element {
           placeholder="********"
         />
       </div>
+
       <div className="space-y-2">
         <SelectField
           label="Currency"
@@ -90,14 +82,8 @@ export function SignUpForm(): JSX.Element {
           className="w-full"
           placeholder="Choose currency"
           options={[
-            {
-              value: 'UAH',
-              label: 'UAH',
-            },
-            {
-              value: 'USD',
-              label: 'USD',
-            },
+            { value: 'UAH', label: 'UAH' },
+            { value: 'USD', label: 'USD' },
           ]}
         />
       </div>

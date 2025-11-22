@@ -1,11 +1,11 @@
-import type { NextRequest } from 'next/server';
+import type { MiddlewareConfig, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 const DASHBOARD_ENTRY = '/dashboard/overview';
 const SIGN_IN_ROUTE = '/sign-in';
 const SIGN_UP_ROUTE = '/sing-up';
 
-const PROTECTED_ROUTES = ['/dashboard'];
+export const PROTECTED_ROUTES = ['/dashboard'];
 
 function hasAuthCookie(request: NextRequest): boolean {
   return Boolean(request.cookies.get(process.env.NEXT_ACCESS_TOKEN_KEY!)?.value);
@@ -32,6 +32,6 @@ export function middleware(request: NextRequest): NextResponse {
   return NextResponse.next();
 }
 
-export const config = {
+export const middlewareConfig: MiddlewareConfig = {
   matcher: ['/dashboard/:path*', '/sign-in', '/sing-up'],
 };

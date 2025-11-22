@@ -107,5 +107,7 @@ export class AuthController {
     }
 
     res.clearCookie(this.configService.getRefreshTokenKey());
+    res.clearCookie(this.configService.getAccessTokenKey());
+    res.send();
   }
 }
