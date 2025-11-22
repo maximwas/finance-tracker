@@ -1,5 +1,11 @@
-import { redirect } from 'next/navigation';
+'use client';
 
-export default function Dashboard(): void {
-  redirect('/dashboard/overview');
+import type { JSX } from 'react';
+
+export default function Overview(): JSX.Element {
+  return (
+    <div>
+      <p></p>
+    </div>
+  );
 }

@@ -23,7 +23,7 @@ export default async function GuardLayout({ children }: IDashboardLayout): Promi
   }
 
   return (
-    <UserProvider initialUser={user.data}>
+    <UserProvider initialUser={null}>
       <SidebarProvider>
         <AppSidebar></AppSidebar>
         <main>{children}</main>

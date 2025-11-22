@@ -12,11 +12,6 @@ import {
 } from '@nestjs/common';
 import type { User } from '@prisma/client';
 import type { Request, Response } from 'express';
-import {
-  HEADER_REQUEST_SSR,
-  HEADER_SIGNATURE_SSR,
-  HEADER_TIMES_SSR,
-} from 'src/api/constants';
 import { Message } from 'src/common/reflector/message.reflector';
 import { getCookie } from 'src/common/utils/get-cookie';
 import { getHeader } from 'src/common/utils/get-header';
@@ -27,6 +22,11 @@ import { JWTAuthGuard } from './guard/jwt-auth.guard';
 import { LocalAuthGuard } from './guard/local-auth.guard';
 import { TokenInterceptor } from './interceptor/token.interceptor';
 import { AuthPayload } from './types/token.type';
+import {
+  HEADER_REQUEST_SSR,
+  HEADER_SIGNATURE_SSR,
+  HEADER_TIMES_SSR,
+} from '../../../../../shared/constants';
 import { ConfigService } from '../../../common/modules/config/config.service';
 import { CurrentUser } from '../../../graphql/modules/user/decorator/user.decorator';
 

@@ -1,34 +1,58 @@
-import type { MiddlewareConfig, NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-const DASHBOARD_ENTRY = '/dashboard/overview';
+import { refreshAccessTokenSSR } from './lib/auth';
+import { isTokenValid } from './utils/jwt';
+
+const DASHBOARD_ENTRY = '/dashboard';
 const SIGN_IN_ROUTE = '/sign-in';
 const SIGN_UP_ROUTE = '/sign-up';
 
-export const PROTECTED_ROUTES = ['/dashboard'];
+export const PROTECTED_ROUTES = ['/dashboard', '/categories', '/expenses', '/settings', '/reports'];
 
-function hasAccessTokenCookie(request: NextRequest): boolean {
-  return Boolean(request.cookies.get(process.env.NEXT_ACCESS_TOKEN_KEY!)?.value);
+function redirectToSignIn(request: NextRequest): NextResponse {
+  const signInUrl = new URL(SIGN_IN_ROUTE, request.url);
+
+  return NextResponse.redirect(signInUrl);
 }
 
-function hasRefreshTokenCookie(request: NextRequest): boolean {
-  return Boolean(request.cookies.get(process.env.NEXT_REFRESH_TOKEN_KEY!)?.value);
-}
-
-export function middleware(request: NextRequest): NextResponse {
+export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
 
   const isGuardRoute = PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
   const isAuthRoute = pathname === SIGN_IN_ROUTE || pathname === SIGN_UP_ROUTE;
 
-  const hasAccess = hasAccessTokenCookie(request);
-  const hasRefresh = hasRefreshTokenCookie(request);
-  const isAuthenticated = hasAccess || hasRefresh;
+  const accessToken = request.cookies.get(process.env.NEXT_ACCESS_TOKEN_KEY!)?.value;
+  const refreshToken = request.cookies.get(process.env.NEXT_REFRESH_TOKEN_KEY!)?.value;
+
+  let isAccessValid = isGuardRoute && isTokenValid(accessToken);
+  const isRefreshValid = isGuardRoute && isTokenValid(refreshToken);
+
+  if (isGuardRoute && !isAccessValid && isRefreshValid && refreshToken) {
+    try {
+      const newAccessToken = await refreshAccessTokenSSR(refreshToken);
+      const response = NextResponse.next();
+
+      isAccessValid = true;
+
+      response.cookies.set({
+        name: process.env.NEXT_ACCESS_TOKEN_KEY!,
+        value: newAccessToken,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        httpOnly: process.env.NODE_ENV === 'production',
+      });
+
+      return response;
+    } catch {
+      return redirectToSignIn(request);
+    }
+  }
+
+  const isAuthenticated = isAccessValid || isRefreshValid;
 
   if (isGuardRoute && !isAuthenticated) {
-    const signInUrl = new URL(SIGN_IN_ROUTE, request.url);
-    signInUrl.searchParams.set('next', pathname);
-    return NextResponse.redirect(signInUrl);
+    return redirectToSignIn(request);
   }
 
   if (isAuthRoute && isAuthenticated) {
@@ -39,6 +63,6 @@ export function middleware(request: NextRequest): NextResponse {
   return NextResponse.next();
 }
 
-export const middlewareConfig: MiddlewareConfig = {
-  matcher: ['/dashboard/:path*', '/sign-in', '/sign-up'],
+export const config = {
+  matcher: [...PROTECTED_ROUTES, SIGN_IN_ROUTE, SIGN_UP_ROUTE],
 };
