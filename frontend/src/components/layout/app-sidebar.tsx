@@ -8,6 +8,7 @@ import type { ComponentType, JSX, SVGProps } from 'react';
 import { useState } from 'react';
 
 import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/contexts/UserContext';
 import { cn } from '@/utils/cn';
 import { getInitial } from '@/utils/name';
 
@@ -77,7 +78,8 @@ const SIDEBAR_MENU: ISidebarMenu[] = [
 export function AppSidebar(): JSX.Element | null {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, setUser } = useUser();
+  const { logout } = useAuth();
   const [optimisticActive, setOptimisticActive] = useState<string | null>(pathname);
 
   const isActive = (url: string): boolean => optimisticActive === url;
@@ -165,6 +167,7 @@ export function AppSidebar(): JSX.Element | null {
               className="w-full justify-start gap-3 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20 group"
               onClick={() => {
                 logout();
+                setUser(null);
                 router.replace('/sign-in');
               }}
             >

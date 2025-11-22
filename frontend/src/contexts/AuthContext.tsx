@@ -1,23 +1,14 @@
 'use client';
 
-import { useRequest } from 'ahooks';
-import { usePathname } from 'next/navigation';
-import { createContext, type JSX, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, type JSX, useCallback, useContext } from 'react';
 
-import { Spinner } from '@/components/ui/spinner';
-import {
-  type ApiResponse,
-  getUser,
-  logout as logoutAuth,
-  signIn as signInAuth,
-  signUp as signUpAuth,
-  type User,
-} from '@/lib/auth';
-import { type IUserName } from '@/lib/utils';
+import { logout as logoutAuth, signIn as signInAuth, signUp as signUpAuth } from '@/lib/auth';
+import { type User } from '@/lib/user';
 import { type SignUpFormValues } from '@/lib/validations/sign-up-schema';
 import { type SingInFormValues } from '@/lib/validations/sing-in-schema';
-import { PROTECTED_ROUTES } from '@/middleware';
+import { type ApiResponse } from '@/types/api';
 import { type DefaultUIProps } from '@/types/default-props.type';
+import { type IUserName } from '@/utils/name';
 
 export interface IAuthContextProps {
   user?: User;
@@ -28,38 +19,7 @@ export interface IAuthContextProps {
 
 const AuthContext = createContext<IAuthContextProps | null>(null);
 
-export function AuthLoader(): JSX.Element {
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <Spinner className="size-6 text-primary" />
-    </div>
-  );
-}
-
 export function AuthProvider({ children }: DefaultUIProps): JSX.Element {
-  const pathname = usePathname();
-  const [user, setUser] = useState<User | undefined>(undefined);
-  const { data, loading, error, run } = useRequest(getUser, {
-    manual: true,
-  });
-
-  useEffect(() => {
-    if (data?.data) {
-      setUser(data.data);
-    } else if (error) {
-      setUser(undefined);
-    }
-  }, [data, error]);
-
-  useEffect(() => {
-    const isProtected = PROTECTED_ROUTES.some((path) => pathname.startsWith(path));
-
-    if (isProtected && !user) {
-      run();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [run, pathname]);
-
   const signUp = useCallback(
     async (body: Omit<SignUpFormValues, 'name'> & IUserName): Promise<ApiResponse> => {
       const response = await signUpAuth(body);
@@ -78,23 +38,18 @@ export function AuthProvider({ children }: DefaultUIProps): JSX.Element {
   const logout = useCallback(async (): Promise<ApiResponse> => {
     const response = await logoutAuth();
 
-    if (response.success) {
-      setUser(undefined);
-    }
-
     return response;
   }, []);
 
   return (
     <AuthContext.Provider
       value={{
-        user,
         signUp,
         signIn,
         logout,
       }}
     >
-      {loading ? <AuthLoader /> : children}
+      {children}
     </AuthContext.Provider>
   );
 }

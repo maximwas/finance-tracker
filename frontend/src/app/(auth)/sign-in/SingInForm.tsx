@@ -35,7 +35,7 @@ export function SingInForm(): JSX.Element {
     <AuthForm<SingInFormValues>
       submitText="Sign in"
       redirectText="Don't have an account?"
-      redirectLink="/sing-up"
+      redirectLink="/sign-up"
       redirectLabel="Sign Up"
       initialValues={{
         email: '',
