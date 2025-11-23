@@ -11,14 +11,18 @@ const SIGN_UP_ROUTE = '/sign-up';
 
 export const PROTECTED_ROUTES = ['/dashboard', '/categories', '/expenses', '/settings', '/reports'];
 
-function redirectToSignIn(request: NextRequest): NextResponse {
+function redirectToSignIn(response: NextResponse, request: NextRequest): NextResponse {
   const signInUrl = new URL(SIGN_IN_ROUTE, request.url);
+
+  response.cookies.delete(process.env.NEXT_ACCESS_TOKEN_KEY!);
+  response.cookies.delete(process.env.NEXT_REFRESH_TOKEN_KEY!);
 
   return NextResponse.redirect(signInUrl);
 }
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
+  const response = NextResponse.next();
 
   const isGuardRoute = PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
   const isAuthRoute = pathname === SIGN_IN_ROUTE || pathname === SIGN_UP_ROUTE;
@@ -32,7 +36,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   if (isGuardRoute && !isAccessValid && isRefreshValid) {
     try {
       const authPayload = await refreshAccessToken({ mode: 'server' });
-      const response = NextResponse.next();
 
       isAccessValid = true;
 
@@ -52,14 +55,14 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
         httpOnly: process.env.NODE_ENV === 'production',
       });
     } catch {
-      return redirectToSignIn(request);
+      return redirectToSignIn(response, request);
     }
   }
 
   const isAuthenticated = isAccessValid && isRefreshValid;
 
   if (isGuardRoute && !isAuthenticated) {
-    return redirectToSignIn(request);
+    return redirectToSignIn(response, request);
   }
 
   if (isAuthRoute && isAuthenticated) {
@@ -68,7 +71,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.redirect(dashboardUrl);
   }
 
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {
