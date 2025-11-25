@@ -9,7 +9,7 @@ import {
   HEADER_SIGNATURE_SSR,
   HEADER_TIMES_SSR,
 } from '../../../../shared/constants';
-import { type AuthPayload, AuthPayloadProp } from '../../../../shared/types/token.type';
+import { type AuthPayload, AuthPayloadProp } from '../../../../shared/src/types/token.type';
 import { hash } from '../../../../shared/utils/hash';
 
 const createSSRHeaders = (refreshToken: string): Record<string, string> => {

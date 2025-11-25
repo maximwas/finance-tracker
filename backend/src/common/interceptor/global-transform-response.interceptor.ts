@@ -8,7 +8,8 @@ import { Reflector } from '@nestjs/core';
 import { GqlContextType } from '@nestjs/graphql';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiResponse } from 'src/common/dto/api-response-dto';
+
+import { ApiResponse } from '@backend/common/dto/api-response-dto';
 
 import { MESSAGE_META_KEY } from '../reflector/message.reflector';
 

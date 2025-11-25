@@ -8,8 +8,14 @@
   "license": "ISC",
   "workspaces": [
     "backend",
-    "frontend"
+    "frontend",
+    "shared"
   ],
+  "scripts": {
+    "start:backend:dev": "concurrently \"npm run shared:dev\" \"npm run backend:dev\"",
+    "shared:dev": "cd shared && tsc -b --watch",
+    "backend:dev": "cd backend && nest start --watch"
+  },
   "devDependencies": {
     "concurrently": "^9.2.1"
   },

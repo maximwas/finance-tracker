@@ -6,6 +6,11 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import type { User } from '@prisma/client';
+import {
+  EXPIRES_AT_ACCESS_TOKEN,
+  EXPIRES_AT_REFRESH_TOKEN,
+} from '@shared/constants';
+import { hash } from '@shared/utils/hash';
 import * as bcrypt from 'bcrypt';
 import dayjs from 'dayjs';
 import { pick } from 'radash';
@@ -18,11 +23,6 @@ import {
   AuthPayloadProp,
   IRefreshTokenOptions,
 } from './types/token.type';
-import {
-  EXPIRES_AT_ACCESS_TOKEN,
-  EXPIRES_AT_REFRESH_TOKEN,
-} from '../../../../../shared/constants';
-import { hash } from '../../../../../shared/utils/hash';
 import { ConfigService } from '../../../common/modules/config/config.service';
 import { UserService } from '../../../graphql/modules/user/user.service';
 

@@ -55,6 +55,7 @@ export default tseslint.config(
         {
           groups: [
             ['^node:', '^@?\\w'],
+            ['^@backend'],
             ['^@/'],
             ['^\\./', '^\\.\\./'],
             ['\\.css$', '\\.scss$'],

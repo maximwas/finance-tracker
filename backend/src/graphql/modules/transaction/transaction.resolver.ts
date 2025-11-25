@@ -1,8 +1,9 @@
 import { UseGuards, UseInterceptors } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Transaction, type User } from '@prisma/client';
-import { GqlAuthGuard } from 'src/api/modules/auth/guard/gql-auth.guard';
-import { GqlResponseInterceptor } from 'src/graphql/interceptor/gql-response-interceptor';
+
+import { GqlAuthGuard } from '@backend/api/modules/auth/guard/gql-auth.guard';
+import { GqlResponseInterceptor } from '@backend/graphql/interceptor/gql-response-interceptor';
 
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { FilterTransactionDto } from './dto/filter-transaction';

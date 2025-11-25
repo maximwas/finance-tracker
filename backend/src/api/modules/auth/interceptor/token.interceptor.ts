@@ -4,17 +4,18 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import type { Request, Response } from 'express';
-import ms from 'ms';
-import { map, Observable, tap } from 'rxjs';
-import { ConfigService } from 'src/common/modules/config/config.service';
-import { getHeader } from 'src/common/utils/get-header';
-
 import {
   EXPIRES_AT_ACCESS_TOKEN,
   EXPIRES_AT_REFRESH_TOKEN,
   HEADER_AVAILABLE_DATA,
-} from '../../../../../../shared/constants';
+} from '@shared/constants';
+import type { Request, Response } from 'express';
+import ms from 'ms';
+import { map, Observable, tap } from 'rxjs';
+
+import { ConfigService } from '@backend/common/modules/config/config.service';
+import { getHeader } from '@backend/common/utils/get-header';
+
 import { AuthPayload, AuthPayloadProp } from '../types/token.type';
 
 @Injectable()

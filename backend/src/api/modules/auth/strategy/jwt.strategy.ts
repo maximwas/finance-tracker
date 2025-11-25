@@ -3,8 +3,9 @@ import { PassportStrategy } from '@nestjs/passport';
 import { User } from '@prisma/client';
 import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { ConfigService } from 'src/common/modules/config/config.service';
-import { UserService } from 'src/graphql/modules/user/user.service';
+
+import { ConfigService } from '@backend/common/modules/config/config.service';
+import { UserService } from '@backend/graphql/modules/user/user.service';
 
 import { JWTPayload } from '../types/jwt-payload';
 

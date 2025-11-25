@@ -1,5 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Payload } from 'src/common/dto/payload.dto';
+
+import { Payload } from '@backend/common/dto/payload.dto';
 
 import { TransactionModel } from './transaction.model';
 

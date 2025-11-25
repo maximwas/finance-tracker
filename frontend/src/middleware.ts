@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { AuthPayloadProp } from '../../shared/types/token.type';
+import { AuthPayloadProp } from '../../shared/src/types/token.type';
 import { refreshAccessToken } from './service/auth';
 import { isTokenValid } from './utils/jwt';
 
